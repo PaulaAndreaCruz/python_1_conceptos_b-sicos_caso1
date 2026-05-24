@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CASO 001 — EL ÚLTIMO MENSAJE DE SOFÍA</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e0d;
+    --bg-panel: #11161a;
+    --bg-deep: #060809;
+    --ink: #e8ecec;
+    --ink-dim: #8a9296;
+    --ink-faint: #3a4144;
+    --accent: #d4ff3a;
+    --accent-dim: #7a9622;
+    --warn: #ffb84d;
+    --blood: #ff4d3a;
+    --grid: rgba(212, 255, 58, 0.05);
+    --mono: 'JetBrains Mono', monospace;
+    --serif: 'Fraunces', Georgia, serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  body {
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      radial-gradient(ellipse at top, rgba(212, 255, 58, 0.04), transparent 60%);
+    background-size: 40px 40px, 40px 40px, 100% 100%;
+    min-height: 100vh;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg,
+      rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px,
+      transparent 1px, transparent 3px);
+    pointer-events: none; z-index: 9999;
+  }
+  .top-bar {
+    position: sticky; top: 0;
+    background: rgba(6, 8, 9, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--ink-faint);
+    padding: 10px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 100;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .top-bar .left { color: var(--accent); }
+  .top-bar .right { color: var(--ink-dim); }
+  .blink { animation: blink 1.4s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0.25; } }
+  .progress-bar {
+    height: 3px; background: var(--bg-deep);
+    width: 100%; position: sticky; top: 40px; z-index: 99;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--warn));
+    width: 0%; transition: width 0.6s ease;
+  }
+
+  /* PORTADA */
+  .cover {
+    min-height: calc(100vh - 80px);
+    padding: 60px 32px;
+    max-width: 1200px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .stamp {
+    display: inline-block;
+    border: 1px solid var(--blood); color: var(--blood);
+    padding: 4px 12px; font-size: 10px; letter-spacing: 0.3em;
+    margin-bottom: 24px; transform: rotate(-1deg);
+  }
+  .case-num { color: var(--ink-dim); font-size: 12px; letter-spacing: 0.4em; margin-bottom: 12px; }
+  h1.title {
+    font-family: var(--serif); font-weight: 300;
+    font-size: clamp(44px, 6.5vw, 80px);
+    line-height: 0.95; letter-spacing: -0.03em; margin-bottom: 24px;
+  }
+  h1.title em { font-style: italic; color: var(--accent); font-weight: 500; }
+  .tagline {
+    font-family: var(--serif); font-style: italic;
+    font-size: 20px; color: var(--ink-dim);
+    max-width: 460px; margin-bottom: 32px;
+  }
+  .meta-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px 28px; font-size: 11px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .meta-grid .label { color: var(--ink-dim); }
+  .meta-grid .value { color: var(--ink); }
+  .cover-art {
+    aspect-ratio: 1;
+    background: var(--bg-panel);
+    border: 1px solid var(--ink-faint);
+    position: relative; overflow: hidden;
+  }
+  .cover-art::after {
+    content: "EVIDENCIA · 001"; position: absolute;
+    bottom: 12px; right: 12px;
+    font-size: 9px; letter-spacing: 0.3em; color: var(--accent);
+  }
+  .start-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--accent); color: var(--bg); border: none;
+    padding: 16px 28px;
+    font-family: var(--mono); font-size: 13px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: pointer; margin-top: 32px;
+    transition: all 0.2s; font-weight: 700;
+  }
+  .start-btn:hover { background: var(--ink); transform: translateY(-2px); }
+  .start-btn::after { content: "→"; font-size: 18px; }
+
+  section.chapter {
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 24px 100px;
+    display: none;
+  }
+  section.chapter.active { display: block; animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .step-label {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 28px; font-size: 11px;
+    letter-spacing: 0.3em; color: var(--accent);
+    text-transform: uppercase;
+  }
+  .step-label::before { content: ""; width: 40px; height: 1px; background: var(--accent); }
+  h2 {
+    font-family: var(--serif); font-weight: 300;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 28px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+  h3 {
+    font-family: var(--serif); font-weight: 500;
+    font-size: 22px; margin: 32px 0 16px; color: var(--ink);
+  }
+
+  .narrative {
+    font-family: var(--serif); font-size: 18px;
+    line-height: 1.7; color: var(--ink);
+    max-width: 680px; margin-bottom: 20px;
+  }
+  .narrative .drop {
+    float: left; font-size: 60px; line-height: 0.85;
+    padding: 6px 12px 0 0; color: var(--accent); font-weight: 500;
+  }
+  .pull-quote {
+    border-left: 2px solid var(--accent);
+    padding: 12px 0 12px 24px;
+    margin: 32px 0;
+    font-family: var(--serif); font-style: italic;
+    font-size: 20px; color: var(--ink-dim);
+    max-width: 600px;
+  }
+
+  /* ESCENA VISUAL POR PISTA */
+  .scene-stage {
+    background: var(--bg-panel);
+    border: 1px solid var(--ink-faint);
+    padding: 14px;
+    margin: 28px 0;
+    overflow: hidden;
+  }
+  .scene-toolbar {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: var(--ink-dim);
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--ink-faint);
+    margin-bottom: 10px;
+  }
+  .scene-toolbar .rec::before {
+    content: "●"; color: var(--blood); margin-right: 6px;
+    animation: blink 1.2s steps(2) infinite;
+  }
+  .scene-svg { width: 100%; height: auto; display: block; }
+
+  /* LECCIÓN */
+  .lesson {
+    background: var(--bg-panel);
+    border-left: 3px solid var(--warn);
+    padding: 24px;
+    margin: 28px 0;
+  }
+  .lesson .lesson-tag {
+    display: inline-block; color: var(--warn);
+    font-size: 10px; letter-spacing: 0.3em;
+    margin-bottom: 14px;
+  }
+  .lesson h4 {
+    font-family: var(--serif); font-size: 22px;
+    font-weight: 500; margin-bottom: 12px; color: var(--ink);
+  }
+  .lesson p { color: var(--ink); font-size: 14px; margin-bottom: 12px; }
+  .lesson code {
+    background: var(--bg-deep); color: var(--accent);
+    padding: 2px 6px; border-radius: 2px; font-size: 13px;
+  }
+  .lesson .demo {
+    background: var(--bg-deep);
+    border: 1px solid var(--ink-faint);
+    padding: 14px; margin: 12px 0;
+    font-family: var(--mono); font-size: 13px;
+    color: var(--ink);
+    white-space: pre; overflow-x: auto;
+  }
+  .lesson .demo .cmt { color: var(--ink-dim); }
+  .lesson .demo .str { color: #ffb84d; }
+  .lesson .demo .kw  { color: #ff7ab8; }
+  .lesson .demo .fn  { color: var(--accent); }
+  .lesson .demo .num { color: #7ad4ff; }
+  .lesson ul { color: var(--ink); padding-left: 20px; margin-top: 8px; }
+  .lesson ul li { margin-bottom: 4px; }
+
+  /* EJERCICIO */
+  .exercise {
+    background: var(--bg-panel);
+    border: 1px solid var(--accent);
+    margin: 28px 0;
+    overflow: hidden;
+  }
+  .exercise-head {
+    background: var(--bg-deep);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--ink-faint);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .exercise-head .name { font-family: var(--serif); font-size: 18px; font-weight: 500; }
+  .exercise-head .badge {
+    font-size: 10px; letter-spacing: 0.3em;
+    color: var(--accent); border: 1px solid var(--accent);
+    padding: 3px 10px;
+  }
+  .exercise-body { padding: 20px; }
+  .exercise .mision {
+    background: var(--bg-deep);
+    padding: 14px 16px;
+    border-left: 2px solid var(--warn);
+    margin-bottom: 16px; font-size: 13px;
+  }
+  .exercise .mision strong { color: var(--warn); }
+  .code-editor {
+    background: #000;
+    border: 1px solid var(--ink-faint);
+    font-family: var(--mono); color: var(--ink);
+    width: 100%; padding: 16px;
+    font-size: 13px; line-height: 1.65;
+    resize: vertical; min-height: 160px;
+    tab-size: 4; outline: none;
+  }
+  .code-editor:focus { border-color: var(--accent); }
+  .ex-controls { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .btn {
+    background: transparent; border: 1px solid var(--ink-faint);
+    color: var(--ink); padding: 10px 18px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary {
+    background: var(--accent); color: var(--bg);
+    border-color: var(--accent); font-weight: 700;
+  }
+  .btn.primary:hover { background: var(--ink); border-color: var(--ink); }
+  .btn.ghost { color: var(--ink-dim); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .console {
+    background: #000;
+    border: 1px solid var(--ink-faint);
+    padding: 14px 16px; margin-top: 12px;
+    font-size: 12px; color: var(--accent);
+    min-height: 50px; max-height: 240px;
+    overflow: auto;
+    white-space: pre-wrap; line-height: 1.6;
+  }
+  .console .err  { color: var(--blood); }
+  .console .ok   { color: var(--accent); }
+  .console .sys  { color: var(--ink-dim); font-style: italic; }
+  .console .warn { color: var(--warn); }
+  details.hint-box {
+    background: var(--bg-deep);
+    border: 1px dashed var(--ink-faint);
+    padding: 12px 16px; margin-top: 12px;
+  }
+  details.hint-box summary {
+    cursor: pointer; color: var(--warn);
+    font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase;
+    list-style: none; user-select: none;
+  }
+  details.hint-box summary::-webkit-details-marker { display: none; }
+  details.hint-box[open] summary { margin-bottom: 12px; }
+  details.hint-box p, details.hint-box pre { color: var(--ink); font-size: 13px; }
+  details.hint-box pre {
+    background: #000; padding: 10px; margin-top: 8px;
+    overflow-x: auto; color: var(--accent); line-height: 1.5;
+  }
+
+  .clue-unlocked {
+    background: linear-gradient(135deg, rgba(212,255,58,0.08), transparent);
+    border: 1px solid var(--accent);
+    padding: 24px; margin: 24px 0;
+    position: relative;
+    animation: clueAppear 0.6s ease;
+  }
+  @keyframes clueAppear {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .clue-unlocked::before {
+    content: "◆ PISTA DESBLOQUEADA";
+    position: absolute; top: -10px; left: 20px;
+    background: var(--bg); color: var(--accent);
+    padding: 0 12px; font-size: 10px; letter-spacing: 0.4em;
+  }
+  .clue-unlocked h4 {
+    font-family: var(--serif); font-size: 22px;
+    font-weight: 500; margin-bottom: 12px; color: var(--accent);
+  }
+  .clue-unlocked p { color: var(--ink); font-size: 15px; }
+
+  .step-nav {
+    display: flex; justify-content: space-between;
+    margin-top: 60px; padding-top: 32px;
+    border-top: 1px solid var(--ink-faint);
+  }
+  .step-nav button {
+    background: transparent; border: 1px solid var(--ink-faint);
+    color: var(--ink); padding: 14px 24px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .step-nav button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .step-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+  .step-nav button.next-locked {
+    background: var(--bg-deep); color: var(--ink-dim);
+  }
+  .step-nav button.next-ready {
+    background: var(--accent); color: var(--bg);
+    border-color: var(--accent); font-weight: 700;
+  }
+  .step-nav button.next-ready:hover {
+    background: var(--ink); border-color: var(--ink);
+  }
+
+  .clues-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px; margin: 24px 0;
+  }
+  .clue-card-mini {
+    background: var(--bg-panel);
+    border: 1px solid var(--ink-faint);
+    padding: 16px; font-size: 13px;
+  }
+  .clue-card-mini .num {
+    color: var(--accent); font-size: 10px;
+    letter-spacing: 0.3em; margin-bottom: 8px;
+  }
+  .clue-card-mini h5 {
+    font-family: var(--serif); font-size: 16px;
+    font-weight: 500; margin-bottom: 6px;
+  }
+  .clue-card-mini p { color: var(--ink-dim); font-size: 12px; }
+
+  .verdict-card {
+    background: linear-gradient(135deg, var(--bg-panel), var(--bg-deep));
+    border: 1px solid var(--accent);
+    padding: 40px; margin: 24px 0;
+    position: relative;
+  }
+  .verdict-card::before {
+    content: "VERDICTO FINAL";
+    position: absolute; top: -10px; left: 24px;
+    background: var(--bg); color: var(--accent);
+    padding: 0 12px; font-size: 10px; letter-spacing: 0.4em;
+  }
+  .verdict-card h3 {
+    font-family: var(--serif); font-size: 28px;
+    font-weight: 300; margin-bottom: 16px;
+  }
+
+  .objective {
+    background: rgba(255, 184, 77, 0.08);
+    border: 1px solid var(--warn);
+    padding: 14px 18px; margin: 16px 0;
+    font-size: 13px;
+  }
+  .objective::before {
+    content: "▸ TU MISIÓN: ";
+    color: var(--warn); font-weight: 700; letter-spacing: 0.1em;
+  }
+
+  /* TIPEO ANIMADO en pantallas SVG */
+  .typing-line { opacity: 0; }
+
+  /* OBJETO INTERACTIVO en escenas */
+  .interactive-obj {
+    cursor: pointer;
+    transition: filter 0.3s;
+  }
+  .interactive-obj:hover { filter: brightness(1.4); }
+  .interactive-obj .glow {
+    fill: var(--accent); fill-opacity: 0.0;
+    stroke: var(--accent); stroke-width: 1.5; stroke-opacity: 0.6;
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { stroke-opacity: 0.4; fill-opacity: 0.0; }
+    50%      { stroke-opacity: 1; fill-opacity: 0.15; }
+  }
+
+  @media (max-width: 800px) {
+    .cover { grid-template-columns: 1fr; padding: 40px 20px; gap: 32px; }
+    section.chapter { padding: 40px 20px 60px; }
+    h1.title { font-size: 44px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <span class="left">◉ EXPEDIENTE ABIERTO</span>
+  <span class="right">CASO #001 · <span class="blink">EN PROGRESO</span></span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- ════════ PORTADA ════════ -->
+<section class="chapter active" id="cover">
+  <div class="cover">
+    <div>
+      <div class="stamp">CONFIDENCIAL · CASO ABIERTO</div>
+      <div class="case-num">CASO 001 · VOL. I</div>
+      <h1 class="title">El último<br>mensaje de <em>Sofía</em>.</h1>
+      <p class="tagline">"Tenía 16 años. Desapareció un martes.<br>Su computador todavía está encendido."</p>
+      <div class="meta-grid">
+        <div><div class="label">Desaparecida</div><div class="value">Sofía Restrepo</div></div>
+        <div><div class="label">Edad</div><div class="value">16 años</div></div>
+        <div><div class="label">Última vez vista</div><div class="value">Martes · 22:14</div></div>
+        <div><div class="label">Lugar</div><div class="value">Su habitación</div></div>
+        <div><div class="label">Sospechosos</div><div class="value">4</div></div>
+        <div><div class="label">Estado</div><div class="value" style="color:var(--blood)">SIN RESOLVER</div></div>
+      </div>
+      <button class="start-btn" onclick="goTo('intro')">Abrir el expediente</button>
+    </div>
+
+    <div class="cover-art">
+      <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block">
+        <defs>
+          <linearGradient id="screen-cv" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0a1015"/>
+            <stop offset="1" stop-color="#1a2530"/>
+          </linearGradient>
+          <pattern id="gridbg-cv" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a2025" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="500" height="500" fill="#0a0e0d"/>
+        <rect width="500" height="500" fill="url(#gridbg-cv)"/>
+        <rect x="20" y="340" width="460" height="160" fill="#1a1410" stroke="#2a1f15"/>
+        <rect x="130" y="210" width="240" height="150" fill="#0d1114" stroke="#3a4144"/>
+        <rect x="138" y="218" width="224" height="134" fill="url(#screen-cv)"/>
+        <text x="148" y="236" font-family="JetBrains Mono" font-size="7" fill="#d4ff3a">&gt;&gt;&gt; print("ayuda")</text>
+        <text x="148" y="248" font-family="JetBrains Mono" font-size="7" fill="#8a9296">ayuda</text>
+        <text x="148" y="266" font-family="JetBrains Mono" font-size="7" fill="#d4ff3a">&gt;&gt;&gt; mensaje = "_ _ _"</text>
+        <text x="148" y="278" font-family="JetBrains Mono" font-size="7" fill="#d4ff3a">&gt;&gt;&gt; print(mensaje)</text>
+        <text x="148" y="290" font-family="JetBrains Mono" font-size="7" fill="#ff4d3a">&gt;&gt;&gt; ???</text>
+        <rect x="138" y="352" width="224" height="8" fill="#0d1114"/>
+        <rect x="40" y="380" width="80" height="60" fill="#3a5a7a" stroke="#1a2530"/>
+        <circle cx="55" cy="395" r="3" fill="#d4ff3a"/>
+        <text x="50" y="420" font-family="JetBrains Mono" font-size="6" fill="#fff">SOFI ♡</text>
+        <rect x="380" y="370" width="90" height="100" rx="8" fill="#5a3a7a" stroke="#2a1a3a"/>
+        <rect x="395" y="390" width="60" height="30" fill="#3a2a5a"/>
+        <circle cx="425" cy="405" r="3" fill="#d4ff3a"/>
+        <rect x="410" y="340" width="30" height="50" rx="4" fill="#0d1114"/>
+        <rect x="413" y="346" width="24" height="38" fill="#1a2025"/>
+        <text x="416" y="362" font-family="JetBrains Mono" font-size="3" fill="#ff4d3a">8 llamadas</text>
+        <text x="416" y="368" font-family="JetBrains Mono" font-size="3" fill="#ff4d3a">perdidas</text>
+        <path d="M 250 400 Q 240 410 230 420 L 220 440" stroke="#fff" stroke-width="2" fill="none"/>
+        <path d="M 260 400 Q 270 410 280 420 L 290 440" stroke="#fff" stroke-width="2" fill="none"/>
+        <circle cx="220" cy="445" r="4" fill="#fff"/>
+        <circle cx="290" cy="445" r="4" fill="#fff"/>
+        <rect x="40" y="40" width="140" height="160" fill="#0a1015" stroke="#2a3035"/>
+        <line x1="110" y1="40" x2="110" y2="200" stroke="#2a3035"/>
+        <line x1="40" y1="120" x2="180" y2="120" stroke="#2a3035"/>
+        <circle cx="145" cy="80" r="22" fill="#1a2025"/>
+        <circle cx="140" cy="76" r="18" fill="#d4dcdc" opacity="0.6"/>
+        <rect x="220" y="60" width="100" height="130" fill="#1a1f1e" stroke="#3a4144"/>
+        <text x="240" y="100" font-family="Fraunces" font-size="14" fill="#ff4d3a">MUSIC</text>
+        <text x="240" y="120" font-family="Fraunces" font-size="14" fill="#d4ff3a">FEST</text>
+        <text x="240" y="140" font-family="Fraunces" font-size="14" fill="#fff">2025</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ INTRO ════════ -->
+<section class="chapter" id="intro">
+  <div class="step-label">Capítulo 01 · El brief</div>
+  <h2>Entras a la habitación de <em>Sofía</em>.</h2>
+
+  <!-- ESCENA: la habitación completa -->
+  <div class="scene-stage">
+    <div class="scene-toolbar">
+      <span class="rec">CÁMARA · HABITACIÓN DE SOFÍA · 09:02 AM</span>
+      <span>MIÉRCOLES</span>
+    </div>
+    <svg viewBox="0 0 900 480" class="scene-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="madera-intro" width="40" height="40" patternUnits="userSpaceOnUse">
+          <rect width="40" height="40" fill="#2a1f15"/>
+          <path d="M 0 10 L 40 10 M 0 25 L 40 25" stroke="#1f1610" stroke-width="0.5"/>
+        </pattern>
+        <linearGradient id="pared-intro" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1a1820"/>
+          <stop offset="1" stop-color="#0d0b15"/>
+        </linearGradient>
+      </defs>
+      <rect width="900" height="320" fill="url(#pared-intro)"/>
+      <rect y="320" width="900" height="160" fill="url(#madera-intro)"/>
+      <line x1="0" y1="320" x2="900" y2="320" stroke="#1a1410"/>
+
+      <!-- ventana con luna -->
+      <rect x="40" y="40" width="170" height="200" fill="#0a1015" stroke="#2a3035"/>
+      <line x1="125" y1="40" x2="125" y2="240" stroke="#2a3035"/>
+      <line x1="40" y1="140" x2="210" y2="140" stroke="#2a3035"/>
+      <circle cx="165" cy="90" r="22" fill="#1a2025"/>
+      <circle cx="160" cy="86" r="18" fill="#e8ecec" opacity="0.5"/>
+      <g opacity="0.4" stroke="#6b7376" stroke-width="0.5">
+        <line x1="60" y1="55" x2="55" y2="75"/>
+        <line x1="85" y1="62" x2="78" y2="82"/>
+        <line x1="195" y1="165" x2="190" y2="185"/>
+      </g>
+
+      <!-- poster de festival -->
+      <rect x="240" y="50" width="120" height="160" fill="#1a1f1e" stroke="#3a4144" transform="rotate(-1 300 130)"/>
+      <text x="258" y="100" font-family="Fraunces" font-size="18" font-style="italic" fill="#ff4d3a" transform="rotate(-1 300 130)">MUSIC</text>
+      <text x="260" y="125" font-family="Fraunces" font-size="18" font-style="italic" fill="#d4ff3a" transform="rotate(-1 300 130)">FEST</text>
+      <text x="262" y="150" font-family="Fraunces" font-size="18" font-style="italic" fill="#fff" transform="rotate(-1 300 130)">2025</text>
+      <text x="262" y="175" font-family="JetBrains Mono" font-size="8" fill="#8a9296" transform="rotate(-1 300 130)">15 · NOV</text>
+
+      <!-- estante con cosas -->
+      <rect x="400" y="80" width="160" height="130" fill="#0d1114" stroke="#2a3035"/>
+      <line x1="400" y1="140" x2="560" y2="140" stroke="#2a3035"/>
+      <!-- libros -->
+      <rect x="410" y="92" width="8" height="40" fill="#7a3c2a"/>
+      <rect x="420" y="92" width="8" height="40" fill="#3a5a7a"/>
+      <rect x="430" y="92" width="8" height="40" fill="#7a9622"/>
+      <rect x="440" y="92" width="8" height="40" fill="#5a3a7a"/>
+      <!-- libro de Python -->
+      <rect x="450" y="92" width="10" height="40" fill="#d4ff3a"/>
+      <text x="453" y="115" font-family="JetBrains Mono" font-size="5" fill="#0a0e0d" transform="rotate(90 458 113)">PYTHON</text>
+      <rect x="462" y="92" width="8" height="40" fill="#3a7a5a"/>
+      <!-- planta en repisa -->
+      <rect x="510" y="100" width="30" height="30" fill="#2a3a2a"/>
+      <path d="M 525 100 Q 515 80 510 95 M 525 100 Q 535 80 540 95 M 525 100 Q 525 75 525 95" stroke="#7a9622" stroke-width="2" fill="none"/>
+      <!-- foto enmarcada -->
+      <rect x="410" y="155" width="50" height="45" fill="#1a1f1e" stroke="#3a4144"/>
+      <circle cx="425" cy="175" r="5" fill="#d4ff3a"/>
+      <circle cx="445" cy="175" r="5" fill="#ff7ab8"/>
+      <path d="M 415 185 Q 425 192 435 188 M 440 185 Q 450 192 455 188" stroke="#fff" stroke-width="1" fill="none"/>
+      <text x="418" y="206" font-family="JetBrains Mono" font-size="5" fill="#8a9296">SOFI + VALE</text>
+
+      <!-- ESCRITORIO -->
+      <rect x="180" y="290" width="540" height="40" fill="#1f1a17" stroke="#3a2f2a"/>
+
+      <!-- LAPTOP ENCENDIDA (centro escena) -->
+      <g class="interactive-obj" id="laptop-intro" onclick="goTo('p1')">
+        <rect x="320" y="180" width="240" height="140" fill="#0d1114" stroke="#3a4144"/>
+        <rect x="326" y="186" width="228" height="124" fill="#0a1520"/>
+        <!-- código en pantalla -->
+        <text x="334" y="202" font-family="JetBrains Mono" font-size="7" fill="#d4ff3a">&gt;&gt;&gt; # Hola, detective.</text>
+        <text x="334" y="214" font-family="JetBrains Mono" font-size="7" fill="#8a9296">&gt;&gt;&gt; # Si lees esto, algo me pasó.</text>
+        <text x="334" y="226" font-family="JetBrains Mono" font-size="7" fill="#8a9296">&gt;&gt;&gt; # Te voy a enseñar Python</text>
+        <text x="334" y="238" font-family="JetBrains Mono" font-size="7" fill="#8a9296">&gt;&gt;&gt; # para que me encuentres.</text>
+        <text x="334" y="258" font-family="JetBrains Mono" font-size="7" fill="#ff4d3a">&gt;&gt;&gt; pista_1 = "..."</text>
+        <text x="334" y="270" font-family="JetBrains Mono" font-size="7" fill="#ff4d3a">&gt;&gt;&gt; print(pista_1)</text>
+        <text x="334" y="290" font-family="JetBrains Mono" font-size="9" fill="#d4ff3a">_</text>
+        <rect x="320" y="316" width="240" height="6" fill="#0d1114"/>
+        <rect x="430" y="320" width="20" height="10" fill="#1f1a17"/>
+        <!-- glow indicador -->
+        <rect x="316" y="176" width="248" height="148" class="glow" fill="none"/>
+        <text x="320" y="166" font-family="JetBrains Mono" font-size="9" fill="#d4ff3a" letter-spacing="2">▸ ABRIR LAPTOP</text>
+      </g>
+
+      <!-- silla -->
+      <rect x="380" y="380" width="120" height="20" fill="#1a1f1e" stroke="#3a4144"/>
+      <rect x="410" y="400" width="60" height="60" fill="#1a1f1e" stroke="#3a4144"/>
+
+      <!-- MOCHILA en la silla -->
+      <g>
+        <rect x="600" y="290" width="100" height="120" rx="10" fill="#5a3a7a" stroke="#2a1a3a"/>
+        <rect x="615" y="320" width="70" height="50" fill="#3a2a5a"/>
+        <circle cx="650" cy="345" r="4" fill="#d4ff3a"/>
+        <path d="M 600 310 Q 590 290 605 290" stroke="#2a1a3a" stroke-width="3" fill="none"/>
+        <path d="M 700 310 Q 710 290 695 290" stroke="#2a1a3a" stroke-width="3" fill="none"/>
+        <text x="615" y="395" font-family="JetBrains Mono" font-size="6" fill="#d4ff3a">MOCHILA</text>
+      </g>
+
+      <!-- celular en mesa de noche -->
+      <rect x="730" y="296" width="50" height="80" rx="6" fill="#0d1114" stroke="#3a4144"/>
+      <rect x="735" y="302" width="40" height="64" fill="#1a2025"/>
+      <text x="740" y="320" font-family="JetBrains Mono" font-size="5" fill="#ff4d3a">8 missed</text>
+      <text x="740" y="328" font-family="JetBrains Mono" font-size="5" fill="#ff4d3a">MAMÁ</text>
+      <text x="740" y="345" font-family="JetBrains Mono" font-size="5" fill="#8a9296">22:14</text>
+      <text x="740" y="352" font-family="JetBrains Mono" font-size="5" fill="#8a9296">→ Vale</text>
+      <text x="740" y="359" font-family="JetBrains Mono" font-size="4" fill="#d4ff3a">"si algo me</text>
+      <text x="740" y="365" font-family="JetBrains Mono" font-size="4" fill="#d4ff3a">pasa abre mi</text>
+      <text x="740" y="371" font-family="JetBrains Mono" font-size="4" fill="#d4ff3a">compu"</text>
+
+      <!-- audífonos colgando -->
+      <path d="M 280 320 Q 270 360 260 400" stroke="#fff" stroke-width="2" fill="none"/>
+      <circle cx="260" cy="403" r="5" fill="#fff"/>
+
+      <!-- taza de café -->
+      <ellipse cx="220" cy="296" rx="22" ry="5" fill="#3a2520"/>
+      <rect x="200" y="275" width="44" height="22" fill="#7a3c2a" stroke="#3a2520"/>
+      <path d="M 244 280 Q 256 285 251 295" fill="none" stroke="#7a3c2a" stroke-width="2"/>
+      <circle cx="222" cy="272" r="2" fill="#fff" opacity="0.4"/>
+
+      <!-- cuaderno -->
+      <rect x="140" y="295" width="60" height="40" fill="#3a5a7a" stroke="#1a2530"/>
+      <line x1="155" y1="295" x2="155" y2="335" stroke="#1a2530"/>
+      <text x="160" y="320" font-family="JetBrains Mono" font-size="6" fill="#fff">SOFI ♡</text>
+
+      <!-- lámpara -->
+      <line x1="780" y1="100" x2="780" y2="200" stroke="#3a4144" stroke-width="2"/>
+      <path d="M 760 100 L 800 100 L 790 80 L 770 80 Z" fill="#1a1f1e" stroke="#3a4144"/>
+      <circle cx="780" cy="105" r="6" fill="#ffb84d" opacity="0.6"/>
+      <ellipse cx="780" cy="200" rx="40" ry="6" fill="#ffb84d" opacity="0.05"/>
+    </svg>
+  </div>
+
+  <p class="narrative">
+    <span class="drop">S</span>ofía Restrepo tiene 16 años. Vive con su mamá y su hermano menor en
+    el cuarto piso de un edificio en Bogotá. Le gusta dibujar, ir a conciertos y, desde hace seis
+    meses, está obsesionada con aprender a programar.
+  </p>
+
+  <p class="narrative">
+    El martes a las 22:14 le mandó un último mensaje a su mejor amiga Vale:
+  </p>
+
+  <div class="pull-quote">«Si algo me pasa, abre mi compu. Está todo ahí. La contraseña la sabes.»</div>
+
+  <p class="narrative">
+    A la mañana siguiente no apareció. Su mochila seguía colgada en la silla. Su celular en la mesa
+    de noche con 8 llamadas perdidas. Y su laptop, encendida, mostraba el último programa que ella
+    escribió.
+  </p>
+
+  <p class="narrative">
+    Vale te llamó a ti porque eres la única persona que ella conoce dispuesta a aprender Python
+    desde cero solo para encontrar a una amiga.
+  </p>
+
+  <div class="objective">
+    Toca la laptop encendida para empezar. Hay 5 pistas dentro. Cada una te enseña algo de Python
+    y te acerca a Sofía.
+  </div>
+
+  <div class="step-nav">
+    <button onclick="goTo('cover')">← Volver</button>
+    <button class="next-ready" onclick="goTo('p1')">Pista 1 · Abrir la laptop →</button>
+  </div>
+</section>
+
+<!-- ════════ PISTA 1: print y variables ════════ -->
+<section class="chapter" id="p1">
+  <div class="step-label">Pista 01 · La primera línea</div>
+  <h2>Te sientas frente a la <em>laptop</em>.</h2>
+
+  <!-- ESCENA: zoom a la laptop -->
+  <div class="scene-stage">
+    <div class="scene-toolbar">
+      <span class="rec">LAPTOP DE SOFÍA · PANTALLA ENCENDIDA</span>
+      <span>EDITOR PYTHON ABIERTO</span>
+    </div>
+    <svg viewBox="0 0 800 360" class="scene-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lap-screen-1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0a1520"/>
+          <stop offset="1" stop-color="#152535"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="360" fill="#0a0e0d"/>
+      <!-- marco de la laptop ampliada -->
+      <rect x="60" y="40" width="680" height="280" rx="6" fill="#0d1114" stroke="#3a4144" stroke-width="2"/>
+      <rect x="80" y="60" width="640" height="240" fill="url(#lap-screen-1)" stroke="#1a2025"/>
+      <!-- barra de ventana -->
+      <rect x="80" y="60" width="640" height="22" fill="#0a1015"/>
+      <circle cx="92" cy="71" r="4" fill="#ff4d3a"/>
+      <circle cx="106" cy="71" r="4" fill="#ffb84d"/>
+      <circle cx="120" cy="71" r="4" fill="#7a9622"/>
+      <text x="340" y="76" font-family="JetBrains Mono" font-size="10" fill="#8a9296">~/sofia/pista_1.py</text>
+      <!-- contenido del editor -->
+      <text x="100" y="108" font-family="JetBrains Mono" font-size="13" fill="#8a9296"># Hola, detective.</text>
+      <text x="100" y="128" font-family="JetBrains Mono" font-size="13" fill="#8a9296"># Si estás leyendo esto, algo me pasó.</text>
+      <text x="100" y="148" font-family="JetBrains Mono" font-size="13" fill="#8a9296"># Te voy a enseñar Python para que me encuentres.</text>
+      <text x="100" y="168" font-family="JetBrains Mono" font-size="13" fill="#8a9296"># Empezamos por lo más fácil.</text>
+      <text x="100" y="188" font-family="JetBrains Mono" font-size="13" fill="#8a9296"># — S.</text>
+      <text x="100" y="220" font-family="JetBrains Mono" font-size="13" fill="#ff7ab8">pista_1</text>
+      <text x="172" y="220" font-family="JetBrains Mono" font-size="13" fill="#e8ecec"> = </text>
+      <text x="200" y="220" font-family="JetBrains Mono" font-size="13" fill="#ffb84d">"ME ESTAN VIGILANDO"</text>
+      <text x="100" y="248" font-family="JetBrains Mono" font-size="13" fill="#8a9296"># ↓ TÚ ESCRIBES AQUÍ</text>
+      <rect x="100" y="258" width="2" height="16" fill="#d4ff3a">
+        <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+      </rect>
+      <!-- post-it -->
+      <rect x="540" y="100" width="120" height="100" fill="#d4ff3a" transform="rotate(3 600 150)"/>
+      <text x="555" y="125" font-family="Fraunces" font-size="11" font-style="italic" fill="#0a0e0d" transform="rotate(3 600 150)">empieza por</text>
+      <text x="555" y="142" font-family="Fraunces" font-size="11" font-style="italic" fill="#0a0e0d" transform="rotate(3 600 150)">lo más fácil:</text>
+      <text x="555" y="170" font-family="JetBrains Mono" font-size="12" fill="#0a0e0d" transform="rotate(3 600 150)">print()</text>
+      <text x="555" y="190" font-family="Fraunces" font-size="9" font-style="italic" fill="#0a0e0d" transform="rotate(3 600 150)">— S.</text>
+    </svg>
+  </div>
+
+  <p class="narrative">
+    Sofía dejó una variable lista. Solo te falta una línea para que el computador hable. Lee la
+    lección, escribe la línea, presiona ejecutar.
+  </p>
+
+  <div class="lesson">
+    <span class="lesson-tag">▸ MINI LECCIÓN · LO QUE NECESITAS SABER</span>
+    <h4>Variables y la función <code>print()</code></h4>
+    <p>Una <strong>variable</strong> es como una cajita con nombre donde guardas algo. En Python se crea así:</p>
+    <div class="demo"><span class="kw">nombre</span> = <span class="str">"Sofía"</span></div>
+    <p>Estamos diciendo: <em>"crea una cajita llamada <code>nombre</code> y guarda dentro la palabra Sofía"</em>.
+    Las comillas son obligatorias cuando guardas <strong>texto</strong> (los programadores le dicen "string").</p>
+    <p>Para <strong>mostrar en pantalla</strong> lo que hay dentro de una variable, usas <code>print()</code>:</p>
+    <div class="demo"><span class="fn">print</span>(<span class="kw">nombre</span>)
+<span class="cmt"># Resultado: Sofía</span></div>
+    <p>Importantísimo: cuando pones la variable <strong>sin comillas</strong>, Python muestra lo que
+    hay <em>adentro</em> de la cajita. Si la pusieras entre comillas (<code>print("nombre")</code>),
+    mostraría literalmente la palabra "nombre". Pequeña diferencia. Cambia todo.</p>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="name">Ejercicio 1 · Tu primer programa</div>
+      <div class="badge">PRINCIPIANTE</div>
+    </div>
+    <div class="exercise-body">
+      <div class="mision">
+        <strong>MISIÓN:</strong> Imprime el contenido de la variable <code>pista_1</code> usando <code>print()</code>.
+      </div>
+      <textarea class="code-editor" id="code1" spellcheck="false">pista_1 = "ME ESTAN VIGILANDO"
+
+# Escribe abajo: imprime el contenido de pista_1
+</textarea>
+      <div class="ex-controls">
+        <button class="btn primary" onclick="runEx(1)">▶ EJECUTAR</button>
+        <button class="btn ghost" onclick="resetEx(1)">↺ Borrar y empezar de nuevo</button>
+      </div>
+      <div class="console" id="out1"><span class="sys">// la consola está esperando tu código...</span></div>
+      <details class="hint-box">
+        <summary>＋ ¿ATASCADO? Pista pequeña</summary>
+        <p>Solo necesitas <strong>una línea</strong>: la palabra <code>print</code>, paréntesis abiertos,
+        el nombre de la variable <strong>sin comillas</strong>, paréntesis cerrados.</p>
+      </details>
+      <details class="hint-box">
+        <summary>＋ Ver solución</summary>
+<pre>pista_1 = "ME ESTAN VIGILANDO"
+
+print(pista_1)
+
+# Resultado en pantalla:
+# ME ESTAN VIGILANDO</pre>
+        <p style="margin-top:10px;">¿Por qué funciona? Porque <code>print()</code> toma lo que sea
+        que haya entre los paréntesis y lo muestra. Como pusiste el nombre de la variable sin
+        comillas, Python fue a la cajita, sacó lo que tenía adentro, y lo escribió en pantalla.</p>
+      </details>
+    </div>
+  </div>
+
+  <div class="clue-unlocked" id="unlock1" style="display:none;">
+    <h4>"ME ESTÁN VIGILANDO"</h4>
+    <p>Esa es la primera pista. Sofía sabía que alguien la observaba. No fue al azar. Sigue al
+    siguiente paso para entender quién.</p>
+  </div>
+
+  <div class="step-nav">
+    <button onclick="goTo('intro')">← Anterior</button>
+    <button id="next1" class="next-locked" disabled>Pista 2 · Bloqueada</button>
+  </div>
+</section>
+
+<!-- ════════ PISTA 2: strings ════════ -->
+<section class="chapter" id="p2">
+  <div class="step-label">Pista 02 · El cajón del escritorio</div>
+  <h2>Tres palabras <em>sueltas</em>. Una frase oculta.</h2>
+
+  <!-- ESCENA: cajón del escritorio abierto con papelitos -->
+  <div class="scene-stage">
+    <div class="scene-toolbar">
+      <span class="rec">CAJÓN DEL ESCRITORIO · ABIERTO</span>
+      <span>3 PAPELITOS ENCONTRADOS</span>
+    </div>
+    <svg viewBox="0 0 800 320" class="scene-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="madera-2" width="60" height="60" patternUnits="userSpaceOnUse">
+          <rect width="60" height="60" fill="#2a1f15"/>
+          <path d="M 0 15 L 60 15 M 0 35 L 60 35 M 0 50 L 60 50" stroke="#1f1610" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="800" height="320" fill="#0a0e0d"/>
+      <!-- cajón -->
+      <rect x="60" y="40" width="680" height="240" fill="url(#madera-2)" stroke="#1f1610" stroke-width="3"/>
+      <!-- interior más oscuro -->
+      <rect x="80" y="60" width="640" height="200" fill="#1f1610" opacity="0.5"/>
+      <!-- manija arriba -->
+      <rect x="370" y="20" width="60" height="14" rx="4" fill="#3a2f2a"/>
+      <circle cx="380" cy="27" r="3" fill="#1a1410"/>
+      <circle cx="420" cy="27" r="3" fill="#1a1410"/>
+
+      <!-- papelito 1 -->
+      <g transform="rotate(-8 200 150)">
+        <rect x="120" y="100" width="160" height="100" fill="#f5ecd9" stroke="#c4b896"/>
+        <rect x="120" y="100" width="160" height="20" fill="#d4c8a8"/>
+        <text x="170" y="160" font-family="Fraunces" font-size="32" font-weight="500" fill="#1a1410">EL</text>
+        <text x="155" y="190" font-family="JetBrains Mono" font-size="8" fill="#7a6850">papelito #1</text>
+      </g>
+
+      <!-- papelito 2 -->
+      <g transform="rotate(5 400 165)">
+        <rect x="320" y="115" width="160" height="100" fill="#f5ecd9" stroke="#c4b896"/>
+        <rect x="320" y="115" width="160" height="20" fill="#d4c8a8"/>
+        <text x="368" y="175" font-family="Fraunces" font-size="32" font-weight="500" fill="#1a1410">DE</text>
+        <text x="355" y="205" font-family="JetBrains Mono" font-size="8" fill="#7a6850">papelito #2</text>
+      </g>
+
+      <!-- papelito 3 -->
+      <g transform="rotate(-3 600 150)">
+        <rect x="520" y="100" width="180" height="100" fill="#f5ecd9" stroke="#c4b896"/>
+        <rect x="520" y="100" width="180" height="20" fill="#d4c8a8"/>
+        <text x="540" y="165" font-family="Fraunces" font-size="28" font-weight="500" fill="#1a1410">PARQUE</text>
+        <text x="555" y="190" font-family="JetBrains Mono" font-size="8" fill="#7a6850">papelito #3</text>
+      </g>
+
+      <!-- nota a mano -->
+      <g transform="rotate(2 660 250)">
+        <rect x="600" y="220" width="130" height="55" fill="#d4ff3a"/>
+        <text x="610" y="240" font-family="Fraunces" font-size="10" font-style="italic" fill="#0a0e0d">faltan 2 palabras:</text>
+        <text x="610" y="254" font-family="JetBrains Mono" font-size="10" fill="#0a0e0d">CHICO · DEL</text>
+        <text x="610" y="267" font-family="Fraunces" font-size="8" font-style="italic" fill="#0a0e0d">— S.</text>
+      </g>
+    </svg>
+  </div>
+
+  <p class="narrative">
+    Abres el cajón del escritorio. Tres papelitos con palabras escritas a mano. Sofía los partió a
+    propósito: si alguien husmeaba sin entender, no podría leer la frase. Pero tú vas a unirlos con
+    código.
+  </p>
+
+  <div class="lesson">
+    <span class="lesson-tag">▸ MINI LECCIÓN</span>
+    <h4>Unir textos: el signo <code>+</code></h4>
+    <p>En Python, los textos (strings) se pueden <strong>pegar</strong> usando el signo más:</p>
+    <div class="demo"><span class="kw">saludo</span> = <span class="str">"Hola"</span>
+<span class="kw">nombre</span> = <span class="str">"Sofía"</span>
+<span class="fn">print</span>(<span class="kw">saludo</span> + <span class="str">" "</span> + <span class="kw">nombre</span>)
+<span class="cmt"># Resultado: Hola Sofía</span></div>
+    <p>Fíjate en el <code>" "</code> del medio: es un espacio en blanco metido entre comillas. Sin
+    él, Python pegaría las palabras sin separación: <code>HolaSofía</code>. Los textos no traen
+    espacios automáticos. Tú decides dónde van.</p>
+    <p>A esto se le llama <strong>concatenar</strong>. Suena pretencioso. Significa "pegar".</p>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="name">Ejercicio 2 · Reconstruir el mensaje</div>
+      <div class="badge">PRINCIPIANTE</div>
+    </div>
+    <div class="exercise-body">
+      <div class="mision">
+        <strong>MISIÓN:</strong> Pega las 5 palabras con <code>+</code>, separadas por espacios, e
+        imprime la frase completa.
+      </div>
+      <textarea class="code-editor" id="code2" spellcheck="false">palabra_1 = "EL"
+palabra_x = "CHICO"
+palabra_y = "DEL"
+palabra_2 = "DE"
+palabra_3 = "PARQUE"
+
+# Pega las 5 palabras con espacios entre ellas e imprime el resultado.
+# Debe salir: EL CHICO DEL PARQUE
+# (la palabra "DE" no la uses, era un señuelo)
+</textarea>
+      <div class="ex-controls">
+        <button class="btn primary" onclick="runEx(2)">▶ EJECUTAR</button>
+        <button class="btn ghost" onclick="resetEx(2)">↺ Borrar</button>
+      </div>
+      <div class="console" id="out2"><span class="sys">// la consola está esperando...</span></div>
+      <details class="hint-box">
+        <summary>＋ Pista</summary>
+        <p>Vas a usar 4 de las 5 variables: <code>palabra_1</code>, <code>palabra_x</code>,
+        <code>palabra_y</code> y <code>palabra_3</code>. Únelas con <code>+</code> y pon un espacio
+        (<code>" "</code>) entre cada una. <strong>No uses <code>palabra_2</code></strong> (era el señuelo).</p>
+      </details>
+      <details class="hint-box">
+        <summary>＋ Ver solución</summary>
+<pre>print(palabra_1 + " " + palabra_x + " " + palabra_y + " " + palabra_3)
+
+# Resultado: EL CHICO DEL PARQUE</pre>
+        <p style="margin-top:10px;">Truco: cada espacio en blanco entre palabras hay que ponerlo
+        <strong>a mano</strong>. Los <code>+</code> solo pegan textos, no agregan nada extra.</p>
+      </details>
+    </div>
+  </div>
+
+  <div class="clue-unlocked" id="unlock2" style="display:none;">
+    <h4>"EL CHICO DEL PARQUE"</h4>
+    <p>Sofía estaba viendo a alguien. Un chico que conocía del parque del barrio. Vale, su mejor
+    amiga, te confirma por mensaje: hace dos semanas Sofía le mencionó a un tal "Mateo" que conoció
+    en el parque mientras dibujaba. Tenía como 20 años. Era nuevo.</p>
+  </div>
+
+  <div class="step-nav">
+    <button onclick="goTo('p1')">← Anterior</button>
+    <button id="next2" class="next-locked" disabled>Pista 3 · Bloqueada</button>
+  </div>
+</section>
+
+<!-- ════════ PISTA 3: listas ════════ -->
+<section class="chapter" id="p3">
+  <div class="step-label">Pista 03 · El cuaderno de dibujo</div>
+  <h2>Una lista de <em>lugares</em>.</h2>
+
+  <!-- ESCENA: cuaderno abierto con lista de lugares -->
+  <div class="scene-stage">
+    <div class="scene-toolbar">
+      <span class="rec">CUADERNO DE DIBUJO · PÁGINA 47</span>
+      <span>LISTA MANUSCRITA</span>
+    </div>
+    <svg viewBox="0 0 800 360" class="scene-svg" xmlns="http://www.w3.org/2000/svg">
+      <rect width="800" height="360" fill="#0a0e0d"/>
+      <!-- cuaderno tapa -->
+      <rect x="60" y="30" width="680" height="300" fill="#3a5a7a" stroke="#1a2530" stroke-width="3"/>
+      <!-- páginas -->
+      <rect x="80" y="50" width="640" height="260" fill="#f5ecd9"/>
+      <!-- línea central (encuadernación) -->
+      <line x1="400" y1="50" x2="400" y2="310" stroke="#c4b896" stroke-width="2"/>
+      <line x1="402" y1="50" x2="402" y2="310" stroke="#c4b896" stroke-width="1"/>
+      <!-- líneas de cuaderno -->
+      <g stroke="#c4b896" stroke-width="0.5">
+        <line x1="100" y1="90" x2="380" y2="90"/>
+        <line x1="100" y1="120" x2="380" y2="120"/>
+        <line x1="100" y1="150" x2="380" y2="150"/>
+        <line x1="100" y1="180" x2="380" y2="180"/>
+        <line x1="100" y1="210" x2="380" y2="210"/>
+        <line x1="100" y1="240" x2="380" y2="240"/>
+        <line x1="100" y1="270" x2="380" y2="270"/>
+        <line x1="420" y1="90" x2="700" y2="90"/>
+        <line x1="420" y1="120" x2="700" y2="120"/>
+        <line x1="420" y1="150" x2="700" y2="150"/>
+        <line x1="420" y1="180" x2="700" y2="180"/>
+        <line x1="420" y1="210" x2="700" y2="210"/>
+        <line x1="420" y1="240" x2="700" y2="240"/>
+        <line x1="420" y1="270" x2="700" y2="270"/>
+      </g>
+      <!-- página izq: dibujo -->
+      <text x="160" y="78" font-family="Fraunces" font-size="14" font-style="italic" fill="#1a1410">~ donde lo he visto ~</text>
+      <!-- mini iconos dibujados -->
+      <g stroke="#1a1410" stroke-width="1" fill="none">
+        <circle cx="130" cy="160" r="20"/>
+        <path d="M 110 160 Q 130 140 150 160"/>
+        <text x="170" y="165" font-family="Fraunces" font-size="11" font-style="italic" fill="#1a1410">parque</text>
+        <rect x="120" y="200" width="20" height="20"/>
+        <path d="M 120 200 L 130 190 L 140 200"/>
+        <text x="170" y="218" font-family="Fraunces" font-size="11" font-style="italic" fill="#1a1410">cafetería</text>
+        <rect x="115" y="240" width="30" height="25"/>
+        <line x1="120" y1="247" x2="140" y2="247"/>
+        <line x1="120" y1="255" x2="140" y2="255"/>
+        <text x="170" y="258" font-family="Fraunces" font-size="11" font-style="italic" fill="#1a1410">biblio</text>
+      </g>
+      <!-- página derecha: lista -->
+      <text x="430" y="78" font-family="Fraunces" font-size="14" font-style="italic" fill="#1a1410">lista en orden:</text>
+      <text x="430" y="105" font-family="JetBrains Mono" font-size="11" fill="#1a1410">[0] PARQUE NACIONAL</text>
+      <text x="430" y="135" font-family="JetBrains Mono" font-size="11" fill="#1a1410">[1] CAFETERIA AROMA</text>
+      <text x="430" y="165" font-family="JetBrains Mono" font-size="11" fill="#1a1410">[2] BIBLIOTECA V. BARCO</text>
+      <text x="430" y="195" font-family="JetBrains Mono" font-size="11" fill="#1a1410">[3] PARQUE DE LA 93</text>
+      <text x="430" y="225" font-family="JetBrains Mono" font-size="11" fill="#ff4d3a" font-weight="700">[4] EDIFICIO ABANDONADO</text>
+      <text x="448" y="240" font-family="JetBrains Mono" font-size="11" fill="#ff4d3a" font-weight="700">CL 72</text>
+      <text x="430" y="275" font-family="Fraunces" font-size="10" font-style="italic" fill="#ff4d3a">"si lees esto y</text>
+      <text x="430" y="290" font-family="Fraunces" font-size="10" font-style="italic" fill="#ff4d3a">no estoy: el último."</text>
+    </svg>
+  </div>
+
+  <p class="narrative">
+    Sacas su cuaderno de dibujo del escritorio. En la página 47, una lista manuscrita: 5 lugares
+    donde se vio con "Mateo" durante las últimas dos semanas. Los numeró del 0 al 4. Y al final
+    una nota: "si lees esto y no estoy: el último".
+  </p>
+
+  <div class="lesson">
+    <span class="lesson-tag">▸ MINI LECCIÓN</span>
+    <h4>Listas: muchas cosas en una sola cajita</h4>
+    <p>Hasta ahora cada variable guardaba <strong>una sola cosa</strong>. Pero a veces necesitas
+    guardar varias. Para eso existen las <strong>listas</strong>. Se escriben con corchetes
+    <code>[ ]</code> y los elementos separados por comas:</p>
+    <div class="demo"><span class="kw">amigos</span> = [<span class="str">"Vale"</span>, <span class="str">"Juan"</span>, <span class="str">"Ana"</span>]
+<span class="fn">print</span>(<span class="kw">amigos</span>)
+<span class="cmt"># Resultado: ['Vale', 'Juan', 'Ana']</span></div>
+    <p>Para acceder a un elemento específico, usas su <strong>posición</strong>. Pero atención al detalle
+    raro: Python empieza a contar desde <strong>0</strong>, no desde 1. El primer elemento es la
+    posición 0, el segundo es la 1, etc. (Por eso Sofía numeró así su lista del 0 al 4.)</p>
+    <div class="demo"><span class="fn">print</span>(<span class="kw">amigos</span>[<span class="num">0</span>])  <span class="cmt"># Vale</span>
+<span class="fn">print</span>(<span class="kw">amigos</span>[<span class="num">1</span>])  <span class="cmt"># Juan</span>
+<span class="fn">print</span>(<span class="kw">amigos</span>[<span class="num">2</span>])  <span class="cmt"># Ana</span></div>
+    <p>Y para saber <strong>cuántos elementos</strong> tiene una lista, usas <code>len()</code> (de "length", longitud):</p>
+    <div class="demo"><span class="fn">print</span>(<span class="fn">len</span>(<span class="kw">amigos</span>))  <span class="cmt"># 3</span></div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="name">Ejercicio 3 · El último lugar</div>
+      <div class="badge">FÁCIL</div>
+    </div>
+    <div class="exercise-body">
+      <div class="mision">
+        <strong>MISIÓN:</strong> Imprime cuántos lugares hay en total, y luego imprime
+        <strong>el último lugar de la lista</strong> (donde lo vio justo antes de desaparecer).
+      </div>
+      <textarea class="code-editor" id="code3" spellcheck="false">lugares = [
+    "PARQUE NACIONAL",
+    "CAFETERIA AROMA",
+    "BIBLIOTECA VIRGILIO BARCO",
+    "PARQUE DE LA 93",
+    "EDIFICIO ABANDONADO CL 72"
+]
+
+# 1) Imprime cuántos lugares hay (usa len)
+# 2) Imprime el último lugar de la lista
+#    Si hay 5 elementos, el último está en la posición... ¿cuál?
+</textarea>
+      <div class="ex-controls">
+        <button class="btn primary" onclick="runEx(3)">▶ EJECUTAR</button>
+        <button class="btn ghost" onclick="resetEx(3)">↺ Borrar</button>
+      </div>
+      <div class="console" id="out3"><span class="sys">// la consola está esperando...</span></div>
+      <details class="hint-box">
+        <summary>＋ Pista</summary>
+        <p>Si la lista tiene 5 elementos, las posiciones son <strong>0, 1, 2, 3 y 4</strong>. El
+        último es la posición <strong>4</strong>. Truco extra: en vez de contar, puedes usar
+        <code>-1</code> que significa "el último". Ambas formas funcionan.</p>
+      </details>
+      <details class="hint-box">
+        <summary>＋ Ver solución</summary>
+<pre>print(len(lugares))      # 5
+print(lugares[4])        # EDIFICIO ABANDONADO CL 72
+
+# Alternativa elegante:
+# print(lugares[-1])     # también funciona</pre>
+        <p style="margin-top:10px;">Las listas son ordenadas. La posición <em>importa</em>. Sofía
+        puso el último lugar al final por una razón.</p>
+      </details>
+    </div>
+  </div>
+
+  <div class="clue-unlocked" id="unlock3" style="display:none;">
+    <h4>"EDIFICIO ABANDONADO CL 72"</h4>
+    <p>Ahí se vieron por última vez. La policía conoce ese edificio: es uno de los puntos del barrio
+    donde han pasado cosas raras. Pero todavía no sabes si Mateo es peligroso o solo un chico que usa
+    el lugar para esconderse. Hay 4 personas que la policía está observando. Necesitas filtrarlas.</p>
+  </div>
+
+  <div class="step-nav">
+    <button onclick="goTo('p2')">← Anterior</button>
+    <button id="next3" class="next-locked" disabled>Pista 4 · Bloqueada</button>
+  </div>
+</section>
+
+<!-- ════════ PISTA 4: bucle for ════════ -->
+<section class="chapter" id="p4">
+  <div class="step-label">Pista 04 · Los sospechosos</div>
+  <h2>Cuatro personas en una <em>pizarra</em>.</h2>
+
+  <!-- ESCENA: pizarra de corcho con 4 fotos -->
+  <div class="scene-stage">
+    <div class="scene-toolbar">
+      <span class="rec">PIZARRA DE CORCHO · ARMARIO DE SOFÍA</span>
+      <span>4 FICHAS ENCONTRADAS</span>
+    </div>
+    <svg viewBox="0 0 800 380" class="scene-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="corcho" width="6" height="6" patternUnits="userSpaceOnUse">
+          <rect width="6" height="6" fill="#7a5a3a"/>
+          <circle cx="2" cy="2" r="0.5" fill="#5a3a1a"/>
+          <circle cx="4" cy="4" r="0.5" fill="#9a7a5a"/>
+        </pattern>
+      </defs>
+      <rect width="800" height="380" fill="#0a0e0d"/>
+      <!-- marco -->
+      <rect x="40" y="20" width="720" height="340" fill="#3a2520" stroke="#1a0f0a" stroke-width="4"/>
+      <rect x="56" y="36" width="688" height="308" fill="url(#corcho)"/>
+
+      <!-- hilo rojo conectando -->
+      <line x1="170" y1="180" x2="370" y2="180" stroke="#ff4d3a" stroke-width="1" opacity="0.7"/>
+      <line x1="370" y1="180" x2="570" y2="180" stroke="#ff4d3a" stroke-width="1" opacity="0.7"/>
+      <line x1="370" y1="180" x2="370" y2="280" stroke="#ff4d3a" stroke-width="1" opacity="0.7"/>
+
+      <!-- ficha 1: Camilo -->
+      <g transform="rotate(-3 130 120)">
+        <rect x="80" y="60" width="100" height="130" fill="#f5ecd9" stroke="#c4b896"/>
+        <rect x="90" y="70" width="80" height="60" fill="#3a5a7a"/>
+        <circle cx="130" cy="100" r="14" fill="#d4c8a8"/>
+        <path d="M 116 122 Q 130 110 144 122 L 144 130 L 116 130 Z" fill="#d4c8a8"/>
+        <text x="92" y="146" font-family="JetBrains Mono" font-size="9" fill="#1a1410" font-weight="700">CAMILO</text>
+        <text x="92" y="158" font-family="JetBrains Mono" font-size="7" fill="#1a1410">45 años</text>
+        <text x="92" y="170" font-family="JetBrains Mono" font-size="7" fill="#1a1410">kioskero</text>
+        <text x="92" y="182" font-family="Fraunces" font-size="8" font-style="italic" fill="#7a6850">simpático</text>
+      </g>
+      <circle cx="130" cy="68" r="4" fill="#ff4d3a"/>
+
+      <!-- ficha 2: Mateo (destacada con marco rojo) -->
+      <g transform="rotate(2 330 130)">
+        <rect x="280" y="60" width="100" height="140" fill="#f5ecd9" stroke="#ff4d3a" stroke-width="2"/>
+        <rect x="290" y="70" width="80" height="60" fill="#5a3a7a"/>
+        <circle cx="330" cy="100" r="14" fill="#d4c8a8"/>
+        <path d="M 316 122 Q 330 110 344 122 L 344 130 L 316 130 Z" fill="#1a1410"/>
+        <text x="294" y="146" font-family="JetBrains Mono" font-size="9" fill="#1a1410" font-weight="700">MATEO</text>
+        <text x="294" y="158" font-family="JetBrains Mono" font-size="7" fill="#1a1410">20 años</text>
+        <text x="294" y="170" font-family="JetBrains Mono" font-size="7" fill="#1a1410">sin trabajo</text>
+        <text x="294" y="184" font-family="JetBrains Mono" font-size="7" fill="#ff4d3a">tatuaje</text>
+        <text x="294" y="194" font-family="JetBrains Mono" font-size="7" fill="#ff4d3a">en muñeca</text>
+      </g>
+      <circle cx="330" cy="68" r="4" fill="#ff4d3a"/>
+
+      <!-- ficha 3: Don Hector -->
+      <g transform="rotate(-2 530 120)">
+        <rect x="480" y="60" width="100" height="130" fill="#f5ecd9" stroke="#c4b896"/>
+        <rect x="490" y="70" width="80" height="60" fill="#7a9622"/>
+        <circle cx="530" cy="100" r="14" fill="#d4c8a8"/>
+        <path d="M 516 122 Q 530 110 544 122 L 544 130 L 516 130 Z" fill="#d4c8a8"/>
+        <text x="488" y="146" font-family="JetBrains Mono" font-size="9" fill="#1a1410" font-weight="700">D. HECTOR</text>
+        <text x="492" y="158" font-family="JetBrains Mono" font-size="7" fill="#1a1410">68 años</text>
+        <text x="492" y="170" font-family="JetBrains Mono" font-size="7" fill="#1a1410">portero</text>
+        <text x="492" y="182" font-family="Fraunces" font-size="8" font-style="italic" fill="#7a6850">amable</text>
+      </g>
+      <circle cx="530" cy="68" r="4" fill="#ff4d3a"/>
+
+      <!-- ficha 4: Andrea -->
+      <g transform="rotate(4 330 290)">
+        <rect x="280" y="220" width="100" height="130" fill="#f5ecd9" stroke="#c4b896"/>
+        <rect x="290" y="230" width="80" height="60" fill="#ff7ab8"/>
+        <circle cx="330" cy="260" r="14" fill="#d4c8a8"/>
+        <path d="M 316 282 Q 330 270 344 282 L 344 290 L 316 290 Z" fill="#7a3c2a"/>
+        <text x="290" y="306" font-family="JetBrains Mono" font-size="9" fill="#1a1410" font-weight="700">ANDREA</text>
+        <text x="292" y="318" font-family="JetBrains Mono" font-size="7" fill="#1a1410">16 años</text>
+        <text x="292" y="330" font-family="JetBrains Mono" font-size="7" fill="#1a1410">compañera</text>
+        <text x="292" y="342" font-family="Fraunces" font-size="8" font-style="italic" fill="#7a6850">celosa</text>
+      </g>
+      <circle cx="330" cy="228" r="4" fill="#ff4d3a"/>
+
+      <!-- nota post-it -->
+      <g transform="rotate(-3 670 280)">
+        <rect x="610" y="230" width="120" height="100" fill="#d4ff3a"/>
+        <text x="618" y="252" font-family="Fraunces" font-size="11" font-style="italic" fill="#0a0e0d">recórrelos a</text>
+        <text x="618" y="266" font-family="Fraunces" font-size="11" font-style="italic" fill="#0a0e0d">todos con un</text>
+        <text x="618" y="282" font-family="JetBrains Mono" font-size="12" fill="#0a0e0d">for</text>
+        <text x="618" y="300" font-family="Fraunces" font-size="9" font-style="italic" fill="#0a0e0d">léelos uno</text>
+        <text x="618" y="312" font-family="Fraunces" font-size="9" font-style="italic" fill="#0a0e0d">por uno.</text>
+        <text x="618" y="325" font-family="Fraunces" font-size="8" font-style="italic" fill="#0a0e0d">— S.</text>
+      </g>
+    </svg>
+  </div>
+
+  <p class="narrative">
+    Detrás de la puerta del armario hay una pizarra de corcho con cuatro fichas. Sofía describió a
+    cada persona del parque. Recórrelas una por una para no perderte ningún detalle.
+  </p>
+
+  <div class="lesson">
+    <span class="lesson-tag">▸ MINI LECCIÓN</span>
+    <h4>El bucle <code>for</code>: hacer algo con cada elemento</h4>
+    <p>Cuando tienes una lista y quieres hacer algo con <strong>cada</strong> elemento, usas
+    <code>for</code>. Se lee así: <em>"para cada cosa en la lista, haz esto"</em>.</p>
+    <div class="demo"><span class="kw">frutas</span> = [<span class="str">"manzana"</span>, <span class="str">"pera"</span>, <span class="str">"uva"</span>]
+
+<span class="kw">for</span> <span class="kw">fruta</span> <span class="kw">in</span> <span class="kw">frutas</span>:
+    <span class="fn">print</span>(<span class="kw">fruta</span>)
+
+<span class="cmt"># Resultado:</span>
+<span class="cmt"># manzana</span>
+<span class="cmt"># pera</span>
+<span class="cmt"># uva</span></div>
+    <p>Tres detalles que <strong>siempre</strong> hay que respetar:</p>
+    <ul>
+      <li>La línea del <code>for</code> termina con <strong>dos puntos</strong> <code>:</code></li>
+      <li>Lo que va a hacer en cada vuelta se escribe <strong>indentado</strong> (con 4 espacios o un Tab al inicio)</li>
+      <li>El nombre <code>fruta</code> lo inventas tú: es una variable temporal que cambia en cada vuelta del bucle</li>
+    </ul>
+    <p style="margin-top:12px;">La indentación (espacios al inicio) no es decorativa en Python. Es
+    obligatoria. Es como Python sabe qué cosas pertenecen al bucle y cuáles no.</p>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="name">Ejercicio 4 · Leer todas las fichas</div>
+      <div class="badge">MEDIO</div>
+    </div>
+    <div class="exercise-body">
+      <div class="mision">
+        <strong>MISIÓN:</strong> Usa un bucle <code>for</code> para imprimir cada sospechoso de la
+        lista, uno por línea.
+      </div>
+      <textarea class="code-editor" id="code4" spellcheck="false">sospechosos = [
+    "Camilo (kioskero) - 45 años, simpatico, conoce a todos",
+    "Mateo (chico del parque) - 20 años, sin trabajo, tatuaje en muñeca",
+    "Don Hector (portero edificio) - 68 años, viejito amable",
+    "Andrea (compañera de colegio) - 16 años, celosa de Sofia"
+]
+
+# Escribe abajo un bucle for que imprima cada sospechoso en su propia línea.
+# Recuerda los 3 detalles: 'for', ':', e indentación con 4 espacios.
+</textarea>
+      <div class="ex-controls">
+        <button class="btn primary" onclick="runEx(4)">▶ EJECUTAR</button>
+        <button class="btn ghost" onclick="resetEx(4)">↺ Borrar</button>
+      </div>
+      <div class="console" id="out4"><span class="sys">// la consola está esperando...</span></div>
+      <details class="hint-box">
+        <summary>＋ Pista</summary>
+        <p>Estructura exacta que necesitas:</p>
+<pre>for persona in sospechosos:
+    print(persona)</pre>
+        <p>Solo dos líneas. Y la segunda <strong>tiene que empezar con espacios</strong> (4 espacios o un Tab).</p>
+      </details>
+      <details class="hint-box">
+        <summary>＋ Ver solución</summary>
+<pre>for persona in sospechosos:
+    print(persona)</pre>
+        <p style="margin-top:10px;">¿Notaste algo al leer las 4 fichas? Mateo tiene un
+        <strong>tatuaje en la muñeca</strong>. Recuerda ese detalle.</p>
+      </details>
+    </div>
+  </div>
+
+  <div class="clue-unlocked" id="unlock4" style="display:none;">
+    <h4>4 sospechosos. Uno con tatuaje.</h4>
+    <p>Sofía describió a cada uno con detalles. El detalle del tatuaje en la muñeca de Mateo es
+    clave: la cámara del edificio abandonado de la calle 72, según la policía, grabó a alguien
+    entrando con Sofía esa noche, pero no se le ve la cara. Solo la muñeca. <strong>Con un
+    tatuaje</strong>. Sigue a la última pista para confirmarlo.</p>
+  </div>
+
+  <div class="step-nav">
+    <button onclick="goTo('p3')">← Anterior</button>
+    <button id="next4" class="next-locked" disabled>Pista 5 · Bloqueada</button>
+  </div>
+</section>
+
+<!-- ════════ PISTA 5: if/else ════════ -->
+<section class="chapter" id="p5">
+  <div class="step-label">Pista 05 · La decisión</div>
+  <h2>Sofía dejó un <em>programa</em>.<br>Solo te falta completarlo.</h2>
+
+  <!-- ESCENA: monitor con CCTV del edificio + código a la derecha -->
+  <div class="scene-stage">
+    <div class="scene-toolbar">
+      <span class="rec">CÁMARA CCTV · EDIFICIO CL 72 · MARTES 22:14</span>
+      <span>EVIDENCIA · MUÑECA CON TATUAJE</span>
+    </div>
+    <svg viewBox="0 0 800 360" class="scene-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cctv" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1a2025"/>
+          <stop offset="1" stop-color="#0a1015"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="360" fill="#0a0e0d"/>
+      <!-- pantalla CCTV -->
+      <rect x="40" y="30" width="360" height="300" fill="#0d1114" stroke="#3a4144" stroke-width="2"/>
+      <rect x="50" y="40" width="340" height="280" fill="url(#cctv)"/>
+      <!-- ruido scanline -->
+      <g opacity="0.15" stroke="#fff" stroke-width="0.3">
+        <line x1="50" y1="60" x2="390" y2="60"/>
+        <line x1="50" y1="90" x2="390" y2="90"/>
+        <line x1="50" y1="120" x2="390" y2="120"/>
+        <line x1="50" y1="150" x2="390" y2="150"/>
+        <line x1="50" y1="180" x2="390" y2="180"/>
+        <line x1="50" y1="210" x2="390" y2="210"/>
+        <line x1="50" y1="240" x2="390" y2="240"/>
+        <line x1="50" y1="270" x2="390" y2="270"/>
+        <line x1="50" y1="300" x2="390" y2="300"/>
+      </g>
+      <!-- HUD -->
+      <text x="60" y="58" font-family="JetBrains Mono" font-size="9" fill="#d4ff3a">CAM 03 · LIVE</text>
+      <text x="320" y="58" font-family="JetBrains Mono" font-size="9" fill="#ff4d3a">REC ●</text>
+      <text x="60" y="312" font-family="JetBrains Mono" font-size="8" fill="#d4ff3a">22:14:33</text>
+      <text x="290" y="312" font-family="JetBrains Mono" font-size="8" fill="#d4ff3a">CL 72 · ENTRADA</text>
+
+      <!-- silueta entrando con sofía -->
+      <!-- pared -->
+      <rect x="50" y="40" width="340" height="160" fill="#0a1015"/>
+      <rect x="60" y="100" width="100" height="100" fill="#1a2025"/>
+      <line x1="100" y1="100" x2="100" y2="200" stroke="#0a0e0d"/>
+      <!-- silueta 1: mateo (de espaldas) -->
+      <ellipse cx="220" cy="140" rx="20" ry="22" fill="#1a1410"/>
+      <path d="M 195 165 L 195 240 L 245 240 L 245 165 Q 240 155 220 155 Q 200 155 195 165 Z" fill="#1a1410"/>
+      <!-- brazo extendido visible con tatuaje -->
+      <rect x="245" y="180" width="40" height="14" rx="6" fill="#d4c8a8"/>
+      <!-- TATUAJE muñeca destacado -->
+      <g>
+        <rect x="270" y="178" width="20" height="18" fill="none" stroke="#ff4d3a" stroke-width="1.5" stroke-dasharray="2 2">
+          <animate attributeName="stroke-opacity" values="0.4;1;0.4" dur="1.5s" repeatCount="indefinite"/>
+        </rect>
+        <path d="M 275 183 L 280 190 L 285 183 M 275 188 L 285 188" stroke="#1a1410" stroke-width="0.8" fill="none"/>
+        <text x="295" y="172" font-family="JetBrains Mono" font-size="7" fill="#ff4d3a">▸ TATUAJE</text>
+        <text x="295" y="182" font-family="JetBrains Mono" font-size="7" fill="#ff4d3a">▸ MUÑECA</text>
+      </g>
+      <!-- silueta sofía (de costado, más baja) -->
+      <ellipse cx="180" cy="170" rx="14" ry="16" fill="#3a2520"/>
+      <path d="M 165 184 L 165 240 L 195 240 L 195 184 Q 192 178 180 178 Q 168 178 165 184 Z" fill="#3a2520"/>
+
+      <!-- flecha entrando -->
+      <path d="M 350 220 L 320 230 L 330 225 L 350 220 L 330 215 L 320 220 Z" fill="#d4ff3a"/>
+
+      <!-- panel derecho: variables del análisis -->
+      <rect x="420" y="30" width="340" height="300" fill="#11161a" stroke="#3a4144"/>
+      <text x="435" y="55" font-family="JetBrains Mono" font-size="11" fill="#d4ff3a">▸ pista_5.py · análisis</text>
+      <line x1="430" y1="65" x2="750" y2="65" stroke="#3a4144"/>
+
+      <text x="435" y="90" font-family="JetBrains Mono" font-size="11" fill="#8a9296"># 4 sospechosos.</text>
+      <text x="435" y="106" font-family="JetBrains Mono" font-size="11" fill="#8a9296"># cada uno: (nombre, edad, tatuaje)</text>
+
+      <text x="435" y="130" font-family="JetBrains Mono" font-size="11" fill="#ff7ab8">sospechosos = [</text>
+      <text x="450" y="146" font-family="JetBrains Mono" font-size="10" fill="#e8ecec">(<tspan fill="#ffb84d">"Camilo"</tspan>,    <tspan fill="#7ad4ff">45</tspan>, <tspan fill="#ff7ab8">False</tspan>),</text>
+      <text x="450" y="162" font-family="JetBrains Mono" font-size="10" fill="#e8ecec">(<tspan fill="#ffb84d">"Mateo"</tspan>,     <tspan fill="#7ad4ff">20</tspan>, <tspan fill="#ff7ab8">True</tspan>),</text>
+      <text x="450" y="178" font-family="JetBrains Mono" font-size="10" fill="#e8ecec">(<tspan fill="#ffb84d">"Don Hector"</tspan>, <tspan fill="#7ad4ff">68</tspan>, <tspan fill="#ff7ab8">False</tspan>),</text>
+      <text x="450" y="194" font-family="JetBrains Mono" font-size="10" fill="#e8ecec">(<tspan fill="#ffb84d">"Andrea"</tspan>,    <tspan fill="#7ad4ff">16</tspan>, <tspan fill="#ff7ab8">False</tspan>),</text>
+      <text x="435" y="210" font-family="JetBrains Mono" font-size="11" fill="#ff7ab8">]</text>
+
+      <text x="435" y="240" font-family="JetBrains Mono" font-size="11" fill="#8a9296"># condición esperada:</text>
+      <text x="435" y="258" font-family="JetBrains Mono" font-size="11" fill="#d4ff3a">tatuaje = True</text>
+      <text x="435" y="274" font-family="JetBrains Mono" font-size="11" fill="#d4ff3a">edad entre 18 y 25</text>
+
+      <text x="435" y="302" font-family="JetBrains Mono" font-size="11" fill="#ff4d3a">if ___ and ___ and ___:</text>
+      <text x="455" y="318" font-family="JetBrains Mono" font-size="10" fill="#ff4d3a">print("CULPABLE")</text>
+    </svg>
+  </div>
+
+  <p class="narrative">
+    En el último archivo, Sofía dejó un programa <strong>casi terminado</strong>. Recorre los 4
+    sospechosos. Para cada uno revisa dos cosas: si tiene tatuaje en la muñeca, y si tiene entre
+    18 y 25 años. Le falta solamente la <strong>condición</strong>. Eso lo escribes tú.
+  </p>
+
+  <div class="lesson">
+    <span class="lesson-tag">▸ MINI LECCIÓN</span>
+    <h4>Decisiones: <code>if</code> y <code>else</code></h4>
+    <p>Las computadoras toman decisiones con <code>if</code> ("si") y <code>else</code> ("si no"). La
+    estructura es:</p>
+    <div class="demo"><span class="kw">edad</span> = <span class="num">17</span>
+
+<span class="kw">if</span> <span class="kw">edad</span> &gt;= <span class="num">18</span>:
+    <span class="fn">print</span>(<span class="str">"Es mayor de edad"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"Es menor de edad"</span>)
+
+<span class="cmt"># Resultado: Es menor de edad</span></div>
+    <p>Para <strong>comparar</strong> cosas usas estos símbolos:</p>
+    <ul>
+      <li><code>==</code> &nbsp;es igual a (¡son <strong>dos signos</strong>! Uno solo es para asignar valor)</li>
+      <li><code>!=</code> &nbsp;es distinto de</li>
+      <li><code>&gt;</code> &nbsp;mayor que &nbsp;&nbsp;<code>&lt;</code> &nbsp;menor que</li>
+      <li><code>&gt;=</code> mayor o igual &nbsp;&nbsp;<code>&lt;=</code> menor o igual</li>
+    </ul>
+    <p style="margin-top:12px;">Para combinar dos o más condiciones, usas <code>and</code> ("y"):</p>
+    <div class="demo"><span class="kw">if</span> <span class="kw">edad</span> &gt;= <span class="num">18</span> <span class="kw">and</span> <span class="kw">edad</span> &lt;= <span class="num">25</span>:
+    <span class="fn">print</span>(<span class="str">"Tiene entre 18 y 25"</span>)</div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="name">Ejercicio 5 · El culpable</div>
+      <div class="badge">FINAL</div>
+    </div>
+    <div class="exercise-body">
+      <div class="mision">
+        <strong>MISIÓN:</strong> Completa el <code>if</code> para que el programa marque a Mateo como
+        CULPABLE (tatuaje = True, edad entre 18 y 25) y a los otros 3 como Descartados.
+      </div>
+      <textarea class="code-editor" id="code5" spellcheck="false"># Cada sospechoso tiene 3 datos: nombre, edad, ¿tiene tatuaje en muñeca?
+sospechosos = [
+    ("Camilo",     45, False),
+    ("Mateo",      20, True),
+    ("Don Hector", 68, False),
+    ("Andrea",     16, False),
+]
+
+for sospechoso in sospechosos:
+    nombre = sospechoso[0]
+    edad = sospechoso[1]
+    tiene_tatuaje = sospechoso[2]
+
+    # Completa el if abajo (reemplaza los ___):
+    if ___ and ___ and ___:
+        print("CULPABLE: " + nombre)
+    else:
+        print("Descartado: " + nombre)
+</textarea>
+      <div class="ex-controls">
+        <button class="btn primary" onclick="runEx(5)">▶ EJECUTAR</button>
+        <button class="btn ghost" onclick="resetEx(5)">↺ Borrar</button>
+      </div>
+      <div class="console" id="out5"><span class="sys">// la consola está esperando...</span></div>
+      <details class="hint-box">
+        <summary>＋ Pista</summary>
+        <p>Las tres condiciones que tienes que combinar con <code>and</code>:</p>
+<pre>tiene_tatuaje == True
+edad &gt;= 18
+edad &lt;= 25</pre>
+        <p>Ponlas todas juntas en una sola línea separadas con <code>and</code>.</p>
+      </details>
+      <details class="hint-box">
+        <summary>＋ Ver solución</summary>
+<pre>if tiene_tatuaje == True and edad &gt;= 18 and edad &lt;= 25:
+    print("CULPABLE: " + nombre)
+else:
+    print("Descartado: " + nombre)
+
+# Resultado:
+# Descartado: Camilo
+# CULPABLE: Mateo
+# Descartado: Don Hector
+# Descartado: Andrea</pre>
+        <p style="margin-top:10px;">Truco extra de pro: cuando una variable ya es True o False (booleana),
+        no hace falta <code>== True</code>. Puedes escribir
+        <code>if tiene_tatuaje and edad &gt;= 18 and edad &lt;= 25:</code>. Las dos formas funcionan.</p>
+      </details>
+    </div>
+  </div>
+
+  <div class="clue-unlocked" id="unlock5" style="display:none;">
+    <h4>CULPABLE: Mateo Sánchez, 20 años.</h4>
+    <p>Tu programa lo confirma. Solo Mateo cumple las dos condiciones. La policía allana el edificio
+    abandonado de la calle 72 esa misma tarde.</p>
+  </div>
+
+  <div class="step-nav">
+    <button onclick="goTo('p4')">← Anterior</button>
+    <button id="next5" class="next-locked" disabled>Ver el veredicto final →</button>
+  </div>
+</section>
+
+<!-- ════════ VERDICTO ════════ -->
+<section class="chapter" id="verdict">
+  <div class="step-label">Veredicto · Cierre del caso</div>
+  <h2>Encontraron a <em>Sofía</em>.</h2>
+
+  <p class="narrative">
+    <span class="drop">A</span> las 16:42 del miércoles, ocho horas después de que tú resolvieras la
+    última pista, la policía irrumpió en el segundo piso del edificio abandonado de la calle 72.
+    Sofía estaba encerrada en una habitación interior, sin ventanas, con la boca tapada con cinta.
+    Estaba viva. Asustada, deshidratada, pero viva.
+  </p>
+
+  <p class="narrative">
+    Mateo Sánchez, 20 años, sin trabajo fijo, había estado siguiendo a Sofía durante tres semanas
+    desde que la vio dibujando en el Parque Nacional. La obsesión escaló rápido. La noche del martes
+    la abordó cuando salía del colegio. La amenazó. La llevó al edificio.
+  </p>
+
+  <p class="narrative">
+    Pero Sofía, durante esas tres semanas, había hecho algo que ningún manual de autodefensa enseña:
+    <strong>documentó todo en código</strong>. Cada vez que lo veía, abría su laptop esa misma noche
+    y guardaba una variable nueva. Un nombre. Una hora. Un detalle físico. Nunca pensó que iba a
+    usarlo así. Pensó que era solo una forma de practicar Python, su nueva obsesión.
+  </p>
+
+  <div class="pull-quote">«No fui valiente. Solo fui ordenada.»<br>
+  <span style="font-size:14px; color:var(--accent); letter-spacing:0.1em">— Sofía, en su declaración a la policía.</span></div>
+
+  <div class="verdict-card">
+    <h3>El caso se cerró en <em style="color:var(--accent)">36 horas</em>.</h3>
+    <p class="narrative" style="margin-bottom:16px;">
+      Sin las pistas que tú resolviste — <code>print</code>, variables, concatenación, listas, bucles,
+      condicionales — la policía hubiera tardado semanas. Tú las cruzaste en una tarde porque Sofía
+      ya había hecho el trabajo difícil: dejar la información en un lenguaje que cualquiera dispuesto
+      a aprender pudiera leer.
+    </p>
+    <p class="narrative" style="margin-bottom:0;">
+      Eso es Python. Eso es programar. No magia, no genios encerrados. Solo personas <em>ordenadas</em>
+      que aprendieron a pedirle al computador exactamente lo que necesitan.
+    </p>
+  </div>
+
+  <h3>Lo que aprendiste hoy</h3>
+  <div class="clues-summary">
+    <div class="clue-card-mini">
+      <div class="num">01</div>
+      <h5>print() y variables</h5>
+      <p>Guardar datos en cajitas y mostrarlos en pantalla.</p>
+    </div>
+    <div class="clue-card-mini">
+      <div class="num">02</div>
+      <h5>Strings y concatenar</h5>
+      <p>Unir textos con el signo <code>+</code>.</p>
+    </div>
+    <div class="clue-card-mini">
+      <div class="num">03</div>
+      <h5>Listas e índices</h5>
+      <p>Guardar muchas cosas y acceder por posición.</p>
+    </div>
+    <div class="clue-card-mini">
+      <div class="num">04</div>
+      <h5>Bucle for</h5>
+      <p>Recorrer una lista y hacer algo con cada elemento.</p>
+    </div>
+    <div class="clue-card-mini">
+      <div class="num">05</div>
+      <h5>if / else</h5>
+      <p>Tomar decisiones con condiciones y comparaciones.</p>
+    </div>
+  </div>
+
+  <p class="narrative" style="margin-top:32px;">El próximo caso es más difícil. Pero también lo eres tú ahora.</p>
+
+  <div style="margin-top:32px; padding:24px; border:1px dashed var(--ink-faint); background:var(--bg-deep);">
+    <div style="color:var(--accent); font-size:11px; letter-spacing:0.3em; margin-bottom:10px;">PRÓXIMO CASO · 002</div>
+    <div style="font-family:var(--serif); font-size:22px; margin-bottom:8px;">"La cuenta de TikTok que no existía"</div>
+    <p style="color:var(--ink-dim); font-size:14px;">
+      Una adolescente recibe mensajes amenazantes de una cuenta que se borra cada noche y vuelve a
+      aparecer cada mañana. Aprenderás: funciones, diccionarios, leer archivos y la magia de los patrones (regex).
+    </p>
+  </div>
+
+  <div class="step-nav">
+    <button onclick="goTo('p5')">← Anterior</button>
+    <button onclick="goTo('cover')">Volver al inicio</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     INTÉRPRETE PYTHON EN JAVASCRIPT (sin Pyodide / sin WASM / sin red)
+     Soporta el subset que necesitan los 5 ejercicios:
+       - print(), variables, strings, números, listas, tuplas, booleanos
+       - len(), indexación positiva/negativa
+       - for ... in ...:
+       - if / else, comparaciones, and, or, not, ==, !=, <, <=, >, >=
+       - concatenación con +, repetición con *
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script>
+/* ───── NAVEGACIÓN ───── */
+const SOLVED = { 1:false, 2:false, 3:false, 4:false, 5:false };
+function goTo(id) {
+  document.querySelectorAll('section.chapter').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) { target.classList.add('active'); window.scrollTo({ top:0, behavior:'smooth' }); }
+  updateProgress();
+}
+function updateProgress() {
+  const total = Object.values(SOLVED).filter(Boolean).length;
+  document.getElementById('progressFill').style.width = (total/5)*100 + '%';
+}
+
+/* ───── EDITOR ───── */
+const originalCode = {};
+[1,2,3,4,5].forEach(n => { originalCode[n] = document.getElementById('code'+n).value; });
+function resetEx(n) {
+  document.getElementById('code'+n).value = originalCode[n];
+  document.getElementById('out'+n).innerHTML = '<span class="sys">// código restaurado.</span>';
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
+}
+
+/* ═══════════ MINI INTÉRPRETE PYTHON ═══════════
+   Cubre exactamente lo que los 5 ejercicios necesitan.
+   Si algo no se reconoce, lanza error con un mensaje amigable.
+*/
+
+class PyError extends Error { constructor(msg){ super(msg); this.name='PyError'; } }
+
+/* TOKENIZER pequeño para expresiones */
+function tokenize(s) {
+  const tokens = [];
+  let i = 0;
+  while (i < s.length) {
+    const c = s[i];
+    if (c === ' ' || c === '\t') { i++; continue; }
+    // strings
+    if (c === '"' || c === "'") {
+      const quote = c; let val = ''; i++;
+      while (i < s.length && s[i] !== quote) {
+        if (s[i] === '\\' && i+1 < s.length) { val += s[i+1]; i += 2; continue; }
+        val += s[i]; i++;
+      }
+      if (s[i] !== quote) throw new PyError('Comilla sin cerrar. ¿Olvidaste cerrar las comillas?');
+      i++; tokens.push({type:'STR', value:val}); continue;
+    }
+    // números
+    if (/[0-9]/.test(c) || (c === '-' && /[0-9]/.test(s[i+1] || '') && (tokens.length === 0 || ['OP','LPAR','COMMA','LBRACK'].includes(tokens[tokens.length-1].type)))) {
+      let num = c; i++;
+      while (i < s.length && /[0-9.]/.test(s[i])) { num += s[i]; i++; }
+      tokens.push({type:'NUM', value:parseFloat(num)}); continue;
+    }
+    // operadores y comparaciones
+    const two = s.substr(i, 2);
+    if (['==','!=','<=','>='].includes(two)) { tokens.push({type:'CMP', value:two}); i += 2; continue; }
+    if (c === '<' || c === '>') { tokens.push({type:'CMP', value:c}); i++; continue; }
+    if (c === '+' || c === '-' || c === '*' || c === '/' || c === '%') { tokens.push({type:'OP', value:c}); i++; continue; }
+    if (c === '(') { tokens.push({type:'LPAR'}); i++; continue; }
+    if (c === ')') { tokens.push({type:'RPAR'}); i++; continue; }
+    if (c === '[') { tokens.push({type:'LBRACK'}); i++; continue; }
+    if (c === ']') { tokens.push({type:'RBRACK'}); i++; continue; }
+    if (c === ',') { tokens.push({type:'COMMA'}); i++; continue; }
+    if (c === ':') { tokens.push({type:'COLON'}); i++; continue; }
+    // identificadores / palabras clave
+    if (/[a-zA-Z_]/.test(c)) {
+      let id = c; i++;
+      while (i < s.length && /[a-zA-Z0-9_]/.test(s[i])) { id += s[i]; i++; }
+      if (id === 'True') { tokens.push({type:'BOOL', value:true}); continue; }
+      if (id === 'False'){ tokens.push({type:'BOOL', value:false}); continue; }
+      if (id === 'None') { tokens.push({type:'NONE'}); continue; }
+      if (id === 'and' || id === 'or' || id === 'not' || id === 'in') { tokens.push({type:'KW', value:id}); continue; }
+      tokens.push({type:'ID', value:id}); continue;
+    }
+    throw new PyError('Carácter inesperado: ' + c);
+  }
+  return tokens;
+}
+
+/* PARSER + EVAL recursivo para expresiones */
+class Parser {
+  constructor(tokens, env) { this.tokens = tokens; this.pos = 0; this.env = env; }
+  peek() { return this.tokens[this.pos]; }
+  next() { return this.tokens[this.pos++]; }
+  expect(type) {
+    const t = this.next();
+    if (!t || t.type !== type) throw new PyError('Se esperaba ' + type + (t ? ', se encontró ' + t.type : ''));
+    return t;
+  }
+  parseExpr() { return this.parseOr(); }
+  parseOr() {
+    let left = this.parseAnd();
+    while (this.peek() && this.peek().type === 'KW' && this.peek().value === 'or') {
+      this.next(); const right = this.parseAnd();
+      left = !!(toBool(left) || toBool(right));
+    }
+    return left;
+  }
+  parseAnd() {
+    let left = this.parseNot();
+    while (this.peek() && this.peek().type === 'KW' && this.peek().value === 'and') {
+      this.next(); const right = this.parseNot();
+      left = !!(toBool(left) && toBool(right));
+    }
+    return left;
+  }
+  parseNot() {
+    if (this.peek() && this.peek().type === 'KW' && this.peek().value === 'not') {
+      this.next(); return !toBool(this.parseNot());
+    }
+    return this.parseCmp();
+  }
+  parseCmp() {
+    let left = this.parseAddSub();
+    while (this.peek() && this.peek().type === 'CMP') {
+      const op = this.next().value;
+      const right = this.parseAddSub();
+      left = compare(left, op, right);
+    }
+    return left;
+  }
+  parseAddSub() {
+    let left = this.parseMulDiv();
+    while (this.peek() && this.peek().type === 'OP' && (this.peek().value === '+' || this.peek().value === '-')) {
+      const op = this.next().value;
+      const right = this.parseMulDiv();
+      if (op === '+') left = pyAdd(left, right);
+      else left = pySub(left, right);
+    }
+    return left;
+  }
+  parseMulDiv() {
+    let left = this.parseUnary();
+    while (this.peek() && this.peek().type === 'OP' && ['*','/','%'].includes(this.peek().value)) {
+      const op = this.next().value;
+      const right = this.parseUnary();
+      if (op === '*') left = pyMul(left, right);
+      else if (op === '/') left = left / right;
+      else left = left % right;
+    }
+    return left;
+  }
+  parseUnary() {
+    if (this.peek() && this.peek().type === 'OP' && this.peek().value === '-') {
+      this.next();
+      const v = this.parseUnary();
+      return -v;
+    }
+    return this.parseIndex();
+  }
+  parseIndex() {
+    let val = this.parsePrimary();
+    while (this.peek() && this.peek().type === 'LBRACK') {
+      this.next();
+      const idx = this.parseExpr();
+      this.expect('RBRACK');
+      val = pyIndex(val, idx);
+    }
+    return val;
+  }
+  parsePrimary() {
+    const t = this.next();
+    if (!t) throw new PyError('Expresión incompleta');
+    if (t.type === 'STR') return t.value;
+    if (t.type === 'NUM') return t.value;
+    if (t.type === 'BOOL') return t.value;
+    if (t.type === 'NONE') return null;
+    if (t.type === 'LPAR') {
+      // tupla o paréntesis
+      if (this.peek() && this.peek().type === 'RPAR') { this.next(); return []; }
+      const items = [this.parseExpr()];
+      let isTuple = false;
+      while (this.peek() && this.peek().type === 'COMMA') {
+        this.next();
+        isTuple = true;
+        if (this.peek() && this.peek().type === 'RPAR') break;
+        items.push(this.parseExpr());
+      }
+      this.expect('RPAR');
+      if (isTuple) { const t = items.slice(); t.__isTuple = true; return t; }
+      return items[0];
+    }
+    if (t.type === 'LBRACK') {
+      const items = [];
+      if (this.peek() && this.peek().type === 'RBRACK') { this.next(); return items; }
+      items.push(this.parseExpr());
+      while (this.peek() && this.peek().type === 'COMMA') {
+        this.next();
+        if (this.peek() && this.peek().type === 'RBRACK') break;
+        items.push(this.parseExpr());
+      }
+      this.expect('RBRACK');
+      return items;
+    }
+    if (t.type === 'ID') {
+      // llamada a función?
+      if (this.peek() && this.peek().type === 'LPAR') {
+        this.next();
+        const args = [];
+        if (!(this.peek() && this.peek().type === 'RPAR')) {
+          args.push(this.parseExpr());
+          while (this.peek() && this.peek().type === 'COMMA') { this.next(); args.push(this.parseExpr()); }
+        }
+        this.expect('RPAR');
+        return callFn(t.value, args, this.env);
+      }
+      if (!(t.value in this.env)) throw new PyError("La variable '" + t.value + "' no existe (¿la escribiste antes o tiene un typo?)");
+      return this.env[t.value];
+    }
+    throw new PyError('Token inesperado: ' + (t.value !== undefined ? t.value : t.type));
+  }
+}
+
+function toBool(v) {
+  if (v === null || v === undefined) return false;
+  if (typeof v === 'boolean') return v;
+  if (typeof v === 'number') return v !== 0;
+  if (typeof v === 'string') return v.length > 0;
+  if (Array.isArray(v)) return v.length > 0;
+  return true;
+}
+function pyAdd(a, b) {
+  if (typeof a === 'string' && typeof b === 'string') return a + b;
+  if (typeof a === 'number' && typeof b === 'number') return a + b;
+  if (Array.isArray(a) && Array.isArray(b)) return a.concat(b);
+  if (typeof a === 'string' && typeof b !== 'string') throw new PyError('No puedes sumar texto con un número. Tienes que convertir: usa str(' + b + ').');
+  if (typeof a === 'number' && typeof b === 'string') throw new PyError('No puedes sumar un número con texto. ¿Olvidaste comillas o convertir con str()?');
+  return a + b;
+}
+function pySub(a, b) {
+  if (typeof a === 'number' && typeof b === 'number') return a - b;
+  throw new PyError('La resta solo funciona con números.');
+}
+function pyMul(a, b) {
+  if (typeof a === 'number' && typeof b === 'number') return a * b;
+  if (typeof a === 'string' && typeof b === 'number') return a.repeat(b);
+  if (typeof a === 'number' && typeof b === 'string') return b.repeat(a);
+  throw new PyError('Multiplicación no soportada entre esos tipos.');
+}
+function pyIndex(arr, idx) {
+  if (!Array.isArray(arr) && typeof arr !== 'string') throw new PyError('Solo se puede indexar listas, tuplas o strings.');
+  let i = idx;
+  if (i < 0) i = arr.length + i;
+  if (i < 0 || i >= arr.length) throw new PyError('Índice fuera de rango: ' + idx + ' (la lista tiene ' + arr.length + ' elementos, posiciones de 0 a ' + (arr.length-1) + ').');
+  return arr[i];
+}
+function compare(a, op, b) {
+  if (op === '==') return pyEq(a, b);
+  if (op === '!=') return !pyEq(a, b);
+  if (op === '<')  return a < b;
+  if (op === '<=') return a <= b;
+  if (op === '>')  return a > b;
+  if (op === '>=') return a >= b;
+  throw new PyError('Operador desconocido: ' + op);
+}
+function pyEq(a, b) {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (!pyEq(a[i], b[i])) return false;
+    return true;
+  }
+  return a === b;
+}
+function callFn(name, args, env) {
+  if (name === 'print') {
+    const out = args.map(formatPy).join(' ');
+    env.__stdout.push(out);
+    return null;
+  }
+  if (name === 'len') {
+    if (args.length !== 1) throw new PyError('len() necesita exactamente 1 argumento');
+    const a = args[0];
+    if (Array.isArray(a) || typeof a === 'string') return a.length;
+    throw new PyError('len() solo funciona con listas, tuplas o strings');
+  }
+  if (name === 'str') return args.map(formatPy).join('');
+  if (name === 'int') { const v = parseInt(args[0]); if (isNaN(v)) throw new PyError('No se pudo convertir a int: ' + args[0]); return v; }
+  if (name === 'range') {
+    let start = 0, stop, step = 1;
+    if (args.length === 1) stop = args[0];
+    else if (args.length === 2) { start = args[0]; stop = args[1]; }
+    else { start = args[0]; stop = args[1]; step = args[2]; }
+    const r = [];
+    if (step > 0) for (let i = start; i < stop; i += step) r.push(i);
+    else for (let i = start; i > stop; i += step) r.push(i);
+    return r;
+  }
+  throw new PyError("Función '" + name + "()' no soportada en este mini-intérprete.");
+}
+function formatPy(v) {
+  if (v === null || v === undefined) return 'None';
+  if (typeof v === 'boolean') return v ? 'True' : 'False';
+  if (typeof v === 'string') return v;
+  if (Array.isArray(v)) {
+    const inner = v.map(reprPy).join(', ');
+    return v.__isTuple ? '(' + inner + (v.length === 1 ? ',' : '') + ')' : '[' + inner + ']';
+  }
+  return String(v);
+}
+function reprPy(v) {
+  if (typeof v === 'string') return "'" + v + "'";
+  return formatPy(v);
+}
+
+/* EJECUTOR de líneas */
+function evalExpr(line, env) {
+  const tokens = tokenize(line);
+  if (tokens.length === 0) return undefined;
+  const p = new Parser(tokens, env);
+  const result = p.parseExpr();
+  if (p.pos < p.tokens.length) throw new PyError('Sobran tokens en la expresión');
+  return result;
+}
+
+/* PARSER de bloques (maneja indentación, for, if/else) */
+function indent(line) {
+  let i = 0;
+  while (i < line.length && (line[i] === ' ' || line[i] === '\t')) {
+    i += line[i] === '\t' ? 4 : 1;
+  }
+  return i;
+}
+function stripComment(line) {
+  // remueve # comentario pero respeta # dentro de strings
+  let inStr = false, quote = '', out = '';
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (inStr) {
+      out += c;
+      if (c === '\\' && i+1 < line.length) { out += line[i+1]; i++; continue; }
+      if (c === quote) inStr = false;
+    } else {
+      if (c === '"' || c === "'") { inStr = true; quote = c; out += c; continue; }
+      if (c === '#') break;
+      out += c;
+    }
+  }
+  return out;
+}
+
+function runProgram(code, env) {
+  // pre-procesar: quitar comentarios, partir en líneas, agrupar listas multilínea
+  let rawLines = code.split('\n').map(l => l.replace(/\r/g,''));
+  // unir líneas con paréntesis/brackets abiertos
+  const lines = [];
+  let buf = '', open = 0, bufIndent = null;
+  for (const raw of rawLines) {
+    const noComment = stripComment(raw);
+    const trimmed = noComment.trim();
+    const ind = indent(noComment);
+    if (open > 0) {
+      buf += ' ' + trimmed;
+      for (const ch of trimmed) {
+        if (ch === '(' || ch === '[') open++;
+        else if (ch === ')' || ch === ']') open--;
+      }
+      if (open <= 0) {
+        lines.push({ind: bufIndent, text: buf.trim()});
+        buf = ''; open = 0; bufIndent = null;
+      }
+    } else {
+      if (trimmed === '') continue;
+      let localOpen = 0;
+      for (const ch of trimmed) {
+        if (ch === '(' || ch === '[') localOpen++;
+        else if (ch === ')' || ch === ']') localOpen--;
+      }
+      if (localOpen > 0) { buf = trimmed; open = localOpen; bufIndent = ind; }
+      else lines.push({ind, text: trimmed});
+    }
+  }
+  if (open > 0) throw new PyError('Paréntesis o corchete sin cerrar.');
+
+  execBlock(lines, 0, lines.length, env);
+}
+
+function execBlock(lines, start, end, env) {
+  let i = start;
+  while (i < end) {
+    const line = lines[i];
+    const text = line.text;
+
+    // FOR
+    const forMatch = text.match(/^for\s+([a-zA-Z_]\w*)\s+in\s+(.+):$/);
+    if (forMatch) {
+      const varName = forMatch[1];
+      const iterableExpr = forMatch[2];
+      const iter = evalExpr(iterableExpr, env);
+      if (!Array.isArray(iter) && typeof iter !== 'string') throw new PyError('for necesita una lista, tupla o string');
+      // encontrar el bloque indentado
+      const blockIndent = i+1 < end ? lines[i+1].ind : -1;
+      if (blockIndent <= line.ind) throw new PyError('El bloque del for está vacío o mal indentado. Recuerda: la línea siguiente debe empezar con 4 espacios.');
+      let j = i+1;
+      while (j < end && lines[j].ind >= blockIndent) j++;
+      for (const item of iter) {
+        env[varName] = item;
+        execBlock(lines, i+1, j, env);
+      }
+      i = j; continue;
+    }
+
+    // IF / ELSE
+    const ifMatch = text.match(/^if\s+(.+):$/);
+    if (ifMatch) {
+      const cond = evalExpr(ifMatch[1], env);
+      const blockIndent = i+1 < end ? lines[i+1].ind : -1;
+      if (blockIndent <= line.ind) throw new PyError('El bloque del if está vacío o mal indentado. La línea siguiente debe empezar con 4 espacios.');
+      let j = i+1;
+      while (j < end && lines[j].ind >= blockIndent) j++;
+      // buscar else
+      let elseStart = -1, elseEnd = -1;
+      if (j < end && lines[j].ind === line.ind && lines[j].text === 'else:') {
+        const elseBlockIndent = j+1 < end ? lines[j+1].ind : -1;
+        if (elseBlockIndent <= line.ind) throw new PyError('El bloque del else está vacío o mal indentado.');
+        elseStart = j+1;
+        let k = j+1;
+        while (k < end && lines[k].ind >= elseBlockIndent) k++;
+        elseEnd = k;
+        if (toBool(cond)) execBlock(lines, i+1, j, env);
+        else execBlock(lines, elseStart, elseEnd, env);
+        i = elseEnd; continue;
+      }
+      if (toBool(cond)) execBlock(lines, i+1, j, env);
+      i = j; continue;
+    }
+
+    // ASIGNACIÓN
+    const assignMatch = text.match(/^([a-zA-Z_]\w*)\s*=\s*(.+)$/);
+    if (assignMatch && !text.match(/^[a-zA-Z_]\w*\s*==/)) {
+      const name = assignMatch[1];
+      const value = evalExpr(assignMatch[2], env);
+      env[name] = value;
+      i++; continue;
+    }
+
+    // EXPRESIÓN suelta (ej: print(...))
+    evalExpr(text, env);
+    i++;
+  }
+}
+
+/* EJECUTOR de un ejercicio */
+function runEx(n) {
+  const out = document.getElementById('out'+n);
+  const code = document.getElementById('code'+n).value;
+  const env = { __stdout: [] };
+  let result = '', errorMsg = null;
+  try {
+    runProgram(code, env);
+    result = env.__stdout.join('\n');
+  } catch (e) {
+    if (e instanceof PyError) errorMsg = '✕ ' + e.message;
+    else errorMsg = '✕ Error: ' + e.message + '\n(Si crees que es un bug del intérprete, simplifica tu código.)';
+  }
+
+  if (errorMsg) {
+    // mensajes amistosos extra
+    if (code.includes('___')) errorMsg = '✕ Todavía hay guiones bajos (___) en tu código. Reemplázalos con código real antes de ejecutar.';
+    out.innerHTML = '<span class="err">' + escapeHtml(errorMsg) + '</span>';
+    return;
+  }
+
+  // VALIDADORES
+  let pass = false, custom = '';
+  const r = result.trim();
+  if (n === 1) {
+    pass = /^ME\s+ESTAN\s+VIGILANDO$/i.test(r);
+    if (!pass) custom = r === ''
+      ? '✕ No imprimiste nada. ¿Recordaste escribir print(pista_1) abajo del comentario?'
+      : '✕ La salida esperada es exactamente: ME ESTAN VIGILANDO';
+  }
+  if (n === 2) {
+    pass = r.includes("EL CHICO DEL PARQUE");
+    if (!pass) custom = '✕ Debe imprimir exactamente: EL CHICO DEL PARQUE. Revisa el orden de las palabras y los espacios entre comillas.';
+  }
+  if (n === 3) {
+    const lines = r.split('\n').map(l => l.trim());
+    pass = lines.includes("5") && lines.some(l => l.includes("EDIFICIO ABANDONADO CL 72"));
+    if (!pass) custom = '✕ Faltan los dos prints: el total (5) y el último lugar de la lista.';
+  }
+  if (n === 4) {
+    const lines = r.split('\n').filter(l => l.trim());
+    pass = r.includes("Camilo") && r.includes("Mateo") && r.includes("Don Hector") && r.includes("Andrea") && lines.length >= 4;
+    if (!pass) custom = '✕ Deberías ver los 4 sospechosos, cada uno en su propia línea. Revisa el bucle for y la indentación del print.';
+  }
+  if (n === 5) {
+    const lines = r.split('\n').map(l => l.trim());
+    pass = lines.includes("Descartado: Camilo")
+        && lines.includes("CULPABLE: Mateo")
+        && lines.includes("Descartado: Don Hector")
+        && lines.includes("Descartado: Andrea");
+    if (!pass) custom = '✕ El programa debe marcar a Mateo como CULPABLE y a los otros 3 como Descartados. Revisa las 3 condiciones del if.';
+  }
+
+  if (pass) {
+    out.innerHTML = '<span class="ok">▸ Salida:\n' + escapeHtml(result) + '\n\n✓ ¡CORRECTO! Pista desbloqueada. Mira abajo y pasa a la siguiente.</span>';
+    SOLVED[n] = true;
+    document.getElementById('unlock'+n).style.display = 'block';
+    const nextBtn = document.getElementById('next'+n);
+    nextBtn.disabled = false;
+    nextBtn.classList.remove('next-locked');
+    nextBtn.classList.add('next-ready');
+    const labels = {
+      1: 'Pista 2 · El cajón →',
+      2: 'Pista 3 · El cuaderno →',
+      3: 'Pista 4 · La pizarra →',
+      4: 'Pista 5 · La decisión final →',
+      5: 'Ver veredicto final →'
+    };
+    nextBtn.textContent = labels[n];
+    const targets = { 1:'p2', 2:'p3', 3:'p4', 4:'p5', 5:'verdict' };
+    nextBtn.onclick = () => goTo(targets[n]);
+    updateProgress();
+    // scroll suave hasta el bloque de pista desbloqueada
+    setTimeout(() => document.getElementById('unlock'+n).scrollIntoView({behavior:'smooth', block:'center'}), 400);
+  } else {
+    out.innerHTML = '<span class="warn">▸ Salida:\n' + escapeHtml(result || '(sin salida)') + '</span>\n\n<span class="err">' + escapeHtml(custom || '✕ La salida no es la esperada. Revisa los pasos.') + '</span>';
+  }
+}
+</script>
+
+</body>
+</html>
